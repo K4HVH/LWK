@@ -13,3 +13,9 @@ Update V1.1\
 -Autowall Updated\
 -Changes to Local Animations\
 -Resolver Updated
+
+Update V1.1.1
+-Fixed Smoke Timer
+-Fixed issue with grenades rendering incorrectly
+-Small other issues with SkinChanger
+-Reverted some ragebot changes due to issue with scanning (will be re-added soon)
