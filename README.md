@@ -10,6 +10,7 @@ Update V1.1.1 (25/05/2021)\
 -Fixed Smoke Timer\
 -Fixed issue with grenades rendering incorrectly\
 -Small other issues with SkinChanger\
+-Removed console on injection\
 -Reverted some ragebot changes due to issue with scanning (will be re-added soon)
 
 Update V1.1 (24/05/2021)\
