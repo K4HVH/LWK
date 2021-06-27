@@ -85,3 +85,6 @@
 #define m_viewrenderbeams g_csgo.m_viewrenderbeams
 #define m_soundservices g_csgo.m_soundservices
 #define m_basefilesys g_csgo.m_basefilesys
+#define m_Enginetool g_csgo.m_enginetool
+
+#include "steam_sdk/steam_api.h"

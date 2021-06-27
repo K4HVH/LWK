@@ -140,11 +140,13 @@ namespace hooks
 		c_menu::get().whitney = io.Fonts->AddFontFromMemoryTTF((void*)whitneymedium, sizeof(whitneymedium), 20.f, &m_config, ranges);
 		c_menu::get().whitney_small = io.Fonts->AddFontFromMemoryTTF((void*)whitneymedium, sizeof(whitneymedium), 15.f, &m_config, ranges);
 		c_menu::get().whitney_small = io.Fonts->AddFontFromMemoryTTF((void*)whitneymedium, sizeof(whitneymedium), 17.f, &m_config, ranges);
+		c_menu::get().astrium = io.Fonts->AddFontFromMemoryTTF((void*)astr, sizeof(astr), 25.f, &m_config, io.Fonts->GetGlyphRangesCyrillic());
 
 		// Icon fonts
 		c_menu::get().ico_menu = io.Fonts->AddFontFromMemoryTTF((void*)icomenu, sizeof(icomenu), 20.f, &m_config, io.Fonts->GetGlyphRangesCyrillic());
 		c_menu::get().ico_bottom = io.Fonts->AddFontFromMemoryTTF((void*)iconbot, sizeof(iconbot), 20.f, &m_config, io.Fonts->GetGlyphRangesCyrillic());
 		c_menu::get().ico_menu_new = io.Fonts->AddFontFromMemoryTTF((void*)newmen, sizeof(newmen), 23.f, &m_config, io.Fonts->GetGlyphRangesCyrillic());
+		c_menu::get().ico_keybinds = io.Fonts->AddFontFromMemoryTTF((void*)icotab, sizeof(icotab), 15.f, &m_config, io.Fonts->GetGlyphRangesCyrillic());
 
 		ImGui_ImplDX9_CreateDeviceObjects();
 		d3d_init = true;
@@ -166,10 +168,14 @@ namespace hooks
 
 		c_menu::get().device = device;
 
+		for (static auto i = 0; i < 1; cummenu.steam_image(), i++);
+
 		ImGui_ImplDX9_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-
+		misc::get().keybinds();
+		c_menu::get().draw_indicators();
+		misc::get().spectators_list();
 		c_menu::get().draw(menu_open);
 		otheresp::get().spread_crosshair(device);
 

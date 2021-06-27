@@ -117,6 +117,20 @@ DWORD WINAPI main(PVOID base)
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	base_address = base;
+
+	/*some steam interfaces*/
+	typedef uint32_t SteamPipeHandle;
+	typedef uint32_t SteamUserHandle;
+	SteamUserHandle hSteamUser = ((SteamUserHandle(__cdecl*)(void))GetProcAddress(GetModuleHandle("steam_api.dll"), "SteamAPI_GetHSteamUser"))();
+	SteamPipeHandle hSteamPipe = ((SteamPipeHandle(__cdecl*)(void))GetProcAddress(GetModuleHandle("steam_api.dll"), "SteamAPI_GetHSteamPipe"))();
+	SteamClient = ((ISteamClient * (__cdecl*)(void))GetProcAddress(GetModuleHandle("steam_api.dll"), "SteamClient"))();
+	SteamGameCoordinator = (ISteamGameCoordinator*)SteamClient->GetISteamGenericInterface(hSteamUser, hSteamPipe, "SteamGameCoordinator001");
+	SteamUser = (ISteamUser*)SteamClient->GetISteamUser(hSteamUser, hSteamPipe, "SteamUser019");
+	SteamFriends = SteamClient->GetISteamFriends(hSteamUser, hSteamPipe, "SteamFriends015");
+	static auto SteamInventory = SteamClient->GetISteamInventory(hSteamUser, hSteamPipe, "STEAMINVENTORY_INTERFACE_V002");
+	auto _ = SteamFriends->GetLargeFriendAvatar(SteamUser->GetSteamID());
+	SteamUtils = SteamClient->GetISteamUtils(hSteamPipe, "SteamUtils009");
+
 	//AllocConsole();
 
 	//if (!freopen(crypt_str("CONOUT$"), crypt_str("w"), stdout))

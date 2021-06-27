@@ -253,6 +253,16 @@ void worldesp::molotov_timer(entity_t* entity)
 
 	auto inferno = reinterpret_cast<inferno_t*>(entity);
 	auto origin = inferno->GetAbsOrigin();
+	if (entity->GetClientClass()->m_ClassID == CInferno) {
+		auto inferno = reinterpret_cast<inferno_t*>(entity);
+
+		Vector mins, maxs;
+		inferno->GetClientRenderable()->GetRenderBounds(mins, maxs);
+
+		render::get().Draw3DFilledCircle(entity->m_vecOrigin(), Vector(maxs - mins).Length2D() * 0.5, g_cfg.esp.molotov_timer_color);
+
+	}
+	static auto inferno_pizdec_lgbt = m_cvar()->FindVar(crypt_str("inferno_max_range"));
 
 	Vector screen_origin;
 
@@ -264,13 +274,15 @@ void worldesp::molotov_timer(entity_t* entity)
 
 	static auto size = Vector2D(35.0f, 5.0f);
 	render::get().circle_filled(screen_origin.x, screen_origin.y - size.y * 0.5f, 60, 20, Color(15, 15, 15, 187));
-
-	render::get().rect_filled(screen_origin.x - size.x * 0.5f, screen_origin.y - size.y * 0.5f - 1.0f, size.x, size.y, Color(37, 37, 37, g_cfg.esp.molotov_timer_color.a()));
-	render::get().rect_filled(screen_origin.x - size.x * 0.5f + 2.0f, screen_origin.y - size.y * 0.5f, (size.x - 4.0f) * factor, size.y - 2.0f, g_cfg.esp.molotov_timer_color);
-
-	render::get().rect(screen_origin.x - size.x * 0.5f, screen_origin.y - size.y * 0.5f, size.x, size.y, Color(7, 7, 7, g_cfg.esp.molotov_timer_color.a()));
-	render::get().text(fonts[ESP], screen_origin.x, screen_origin.y - size.y * 0.5f + 12.0f, g_cfg.esp.molotov_timer_color, HFONT_CENTERED_X | HFONT_CENTERED_Y, "FIRE");
-	render::get().text(fonts[GRENADES], screen_origin.x + 1.0f, screen_origin.y - size.y * 0.5f - 9.0f, g_cfg.esp.molotov_timer_color, HFONT_CENTERED_X | HFONT_CENTERED_Y, "l");
+	//int x, int y, int radius, int start_angle, int percent, int thickness, Color color
+	render::get().draw_arc(screen_origin.x, screen_origin.y - size.y * 0.5f, 20, -90, (360 * factor), 2, (15, 15, 15, g_cfg.esp.molotov_timer_color));
+	//
+	//render::get().rect_filled(screen_origin.x - size.x * 0.5f, screen_origin.y - size.y * 0.5f - 1.0f, size.x, size.y, Color(37, 37, 37, g_cfg.esp.molotov_timer_color.a()));
+	//render::get().rect_filled(screen_origin.x - size.x * 0.5f + 2.0f, screen_origin.y - size.y * 0.5f, (size.x - 4.0f) * factor, size.y - 2.0f, g_cfg.esp.molotov_timer_color);
+	//
+	//render::get().rect(screen_origin.x - size.x * 0.5f, screen_origin.y - size.y * 0.5f, size.x, size.y, Color(7, 7, 7, g_cfg.esp.molotov_timer_color.a()));
+	render::get().text(fonts[ESP], screen_origin.x, screen_origin.y - size.y * 0.5f + 12.0f, g_cfg.esp.molotov_timer_color, HFONT_CENTERED_X | HFONT_CENTERED_Y, "");
+	render::get().text(fonts[GRENADES], screen_origin.x + 1.0f, screen_origin.y - size.y * 0.5f + 2.0f, g_cfg.esp.molotov_timer_color, HFONT_CENTERED_X | HFONT_CENTERED_Y, "l");
 }
 
 void worldesp::smoke_timer(entity_t* entity)
@@ -295,13 +307,14 @@ void worldesp::smoke_timer(entity_t* entity)
 
 	static auto size = Vector2D(35.0f, 5.0f);
 	render::get().circle_filled(screen_origin.x, screen_origin.y - size.y * 0.5f, 60, 20, Color(15, 15, 15, 187));
+	render::get().draw_arc(screen_origin.x, screen_origin.y - size.y * 0.5f, 20, -90, (360 * factor), 2, (15, 15, 15, g_cfg.esp.smoke_timer_color));
 
-	render::get().rect_filled(screen_origin.x - size.x * 0.5f, screen_origin.y - size.y * 0.5f - 1.0f, size.x, size.y, Color(37, 37, 37, g_cfg.esp.smoke_timer_color.a()));
-	render::get().rect_filled(screen_origin.x - size.x * 0.5f + 2.0f, screen_origin.y - size.y * 0.5f, (size.x - 4.0f) * factor, size.y - 2.0f, g_cfg.esp.smoke_timer_color);
+	//render::get().rect_filled(screen_origin.x - size.x * 0.5f, screen_origin.y - size.y * 0.5f - 1.0f, size.x, size.y, Color(37, 37, 37, g_cfg.esp.smoke_timer_color.a()));
+//	render::get().rect_filled(screen_origin.x - size.x * 0.5f + 2.0f, screen_origin.y - size.y * 0.5f, (size.x - 4.0f) * factor, size.y - 2.0f, g_cfg.esp.smoke_timer_color);
 
-	render::get().rect(screen_origin.x - size.x * 0.5f, screen_origin.y - size.y * 0.5f, size.x, size.y, Color(7, 7, 7, g_cfg.esp.smoke_timer_color.a()));
-	render::get().text(fonts[ESP], screen_origin.x, screen_origin.y - size.y * 0.5f + 12.0f, g_cfg.esp.smoke_timer_color, HFONT_CENTERED_X | HFONT_CENTERED_Y, "SMOKE");
-	render::get().text(fonts[GRENADES], screen_origin.x + 1.0f, screen_origin.y - size.y * 0.5f - 9.0f, g_cfg.esp.smoke_timer_color, HFONT_CENTERED_X | HFONT_CENTERED_Y, "k");
+//	render::get().rect(screen_origin.x - size.x * 0.5f, screen_origin.y - size.y * 0.5f, size.x, size.y, Color(7, 7, 7, g_cfg.esp.smoke_timer_color.a()));
+	render::get().text(fonts[ESP], screen_origin.x, screen_origin.y - size.y * 0.5f + 12.0f, g_cfg.esp.smoke_timer_color, HFONT_CENTERED_X | HFONT_CENTERED_Y, "");
+	render::get().text(fonts[GRENADES], screen_origin.x + 1.0f, screen_origin.y - size.y * 0.5f + 2.0f, g_cfg.esp.smoke_timer_color, HFONT_CENTERED_X | HFONT_CENTERED_Y, "k");
 }
 
 void worldesp::grenade_projectiles(entity_t* entity)
@@ -491,24 +504,39 @@ void worldesp::bomb_timer(entity_t* entity)
 	static int width, height;
 	m_engine()->GetScreenSize(width, height);
 
-	auto factor = bomb_timer / c4timer * height;
+	auto factor = bomb_timer / c4timer;
 
 	auto red_factor = (int)(255.0f - bomb_timer / c4timer * 255.0f);
 	auto green_factor = (int)(bomb_timer / c4timer * 255.0f);
 
-	render::get().rect_filled(0, height - factor, 26, factor, Color(red_factor, green_factor, 0, 100));
+	//render::get().rect_filled(50, 400, 26, factor, Color(red_factor, green_factor, 0, 100));
+	//render::get().draw_arc()
+	//render::get().draw_arc(45 , 350-factor, 30, -90, (360* factor), 4, Color(red_factor, green_factor, 0, 100));
+	//render::get().draw_arc(50, 350 - factor * 0.5f, 20, -90, (360 * factor), 2, Color (red_factor, green_factor, 0, 100));
+
 
 	auto text_position = height - factor + 11;
-
+	auto text_position1 = height - factor + 23;
 	if (text_position > height - 9)
 		text_position = height - 9;
 
-	render::get().text(fonts[ESP], 13, text_position, Color::White, HFONT_CENTERED_X | HFONT_CENTERED_Y, "%0.1f", bomb_timer);
+	if (text_position1 > height - 12)
+		text_position1 = height - 12;
+	render::get().rect_filled(30, 490, 120, 40, Color(15, 15, 62, 150));
+	render::get().text(fonts[BOMB1], 110, 510, Color(red_factor, green_factor, 0, 255), HFONT_CENTERED_X | HFONT_CENTERED_Y, "%0.1f", bomb_timer);
+	render::get().text(fonts[BOMB], 60, 510, Color(104, 108, 188, 255), HFONT_CENTERED_X | HFONT_CENTERED_Y, "o");
+	render::get().rect_filled(30, 520 - factor, 120, factor, Color(red_factor, green_factor, 0, 100));
+
+	render::get().rect(30, 490, 120, 2, Color(104, 108, 188, 255));
+	//render::get().rect_filled(30, height - factor, 26, factor, Color(red_factor, green_factor, 0, 100));
+
+	//render::get().rect_filled()
 
 	Vector screen;
 
 	if (math::world_to_screen(entity->GetAbsOrigin(), screen))
-		render::get().text(fonts[ESP], screen.x, screen.y, Color(red_factor, green_factor, 0), HFONT_CENTERED_X | HFONT_CENTERED_Y, "BOMB");
+		render::get().text(fonts[GRENADES], screen.x, screen.y, Color(red_factor, green_factor, 0), HFONT_CENTERED_X | HFONT_CENTERED_Y, "o");
+
 }
 
 void worldesp::dropped_weapons(entity_t* entity)

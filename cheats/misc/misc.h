@@ -6,6 +6,7 @@ public:
 	void watermark();
 	void NoDuck(CUserCmd* cmd);
 	void ChatSpamer();
+	void keybinds();
 	void AutoCrouch(CUserCmd* cmd);
 	void SlideWalk(CUserCmd* cmd);
 	void automatic_peek(CUserCmd* cmd, float wish_yaw);

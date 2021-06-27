@@ -59,7 +59,7 @@
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>lua\lua\src;ImGui\UI\freetype\include;ImGui\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath);$(DXSDK_DIR)Include;$(SolutionDir);$(SolutionDir)\lua</IncludePath>
+    <IncludePath>lua\lua\src;ImGui\UI\freetype\include;ImGui\include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(IncludePath);$(DXSDK_DIR)Include;$(SolutionDir);$(SolutionDir)\lua;steam_sdk</IncludePath>
     <LibraryPath>lua\lua\src;$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);ImGui\win32;ImGui\UI\freetype\objs;$(LibraryPath);$(DXSDK_DIR)Lib\x86</LibraryPath>
     <TargetName>LWK</TargetName>
   </PropertyGroup>
@@ -470,6 +470,43 @@
     <ClInclude Include="sdk\misc\UtlVectorSimple.hpp" />
     <ClInclude Include="sdk\misc\vfunc.hpp" />
     <ClInclude Include="sdk\structs.hpp" />
+    <ClInclude Include="steam_sdk\isteamapplist.h" />
+    <ClInclude Include="steam_sdk\isteamapps.h" />
+    <ClInclude Include="steam_sdk\isteamappticket.h" />
+    <ClInclude Include="steam_sdk\isteamclient.h" />
+    <ClInclude Include="steam_sdk\isteamcontroller.h" />
+    <ClInclude Include="steam_sdk\isteamfriends.h" />
+    <ClInclude Include="steam_sdk\isteamgamecoordinator.h" />
+    <ClInclude Include="steam_sdk\isteamgameserver.h" />
+    <ClInclude Include="steam_sdk\isteamgameserverstats.h" />
+    <ClInclude Include="steam_sdk\isteamhtmlsurface.h" />
+    <ClInclude Include="steam_sdk\isteamhttp.h" />
+    <ClInclude Include="steam_sdk\isteaminventory.h" />
+    <ClInclude Include="steam_sdk\isteammasterserverupdater.h" />
+    <ClInclude Include="steam_sdk\isteammatchmaking.h" />
+    <ClInclude Include="steam_sdk\isteammusic.h" />
+    <ClInclude Include="steam_sdk\isteammusicremote.h" />
+    <ClInclude Include="steam_sdk\isteamnetworking.h" />
+    <ClInclude Include="steam_sdk\isteamparentalsettings.h" />
+    <ClInclude Include="steam_sdk\isteamps3overlayrenderer.h" />
+    <ClInclude Include="steam_sdk\isteamremotestorage.h" />
+    <ClInclude Include="steam_sdk\isteamscreenshots.h" />
+    <ClInclude Include="steam_sdk\isteamugc.h" />
+    <ClInclude Include="steam_sdk\isteamuser.h" />
+    <ClInclude Include="steam_sdk\isteamuserstats.h" />
+    <ClInclude Include="steam_sdk\isteamutils.h" />
+    <ClInclude Include="steam_sdk\isteamvideo.h" />
+    <ClInclude Include="steam_sdk\matchmakingtypes.h" />
+    <ClInclude Include="steam_sdk\steamclientpublic.h" />
+    <ClInclude Include="steam_sdk\steamencryptedappticket.h" />
+    <ClInclude Include="steam_sdk\steamhttpenums.h" />
+    <ClInclude Include="steam_sdk\steamps3params.h" />
+    <ClInclude Include="steam_sdk\steamtypes.h" />
+    <ClInclude Include="steam_sdk\steamuniverse.h" />
+    <ClInclude Include="steam_sdk\steam_api.h" />
+    <ClInclude Include="steam_sdk\steam_api_flat.h" />
+    <ClInclude Include="steam_sdk\steam_api_internal.h" />
+    <ClInclude Include="steam_sdk\steam_gameserver.h" />
     <ClInclude Include="TlsClient\crypt_data.h" />
     <ClInclude Include="TlsClient\TlsClient.h" />
     <ClInclude Include="utils\anti_debug.h" />

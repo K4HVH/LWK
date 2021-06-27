@@ -316,9 +316,9 @@ void ImGui::StyleColorsClassic(ImGuiStyle* dst)
     style->PopupRounding = 4.0f;
     style->PopupBorderSize = 1.0f;
     style->FramePadding = ImVec2(4, 4);
-    style->FrameRounding = 2.0f;
+    style->FrameRounding = 4.0f;
     style->FrameBorderSize = 0.0f;
-    style->ItemSpacing = ImVec2(8, 4);
+    style->ItemSpacing = ImVec2(8, 8);
     style->ItemInnerSpacing = ImVec2(4, 4);
     style->IndentSpacing = 6.0f;
     style->ColumnsMinSpacing = 6.0f;

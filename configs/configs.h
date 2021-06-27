@@ -357,9 +357,6 @@ struct Config
 		int fakelag_type;
 		int fakelag_amount;
 		int triggers_fakelag_amount;
-		int desync_range;
-		int pitch;
-		int yaw;
 		struct type
 		{
 			int pitch;
@@ -581,6 +578,7 @@ struct Config
 		float aspect_ratio_amount;
 		bool anti_screenshot;
 		bool anti_untrusted;
+		bool indicators;
 	} misc;
 
 	struct Skins_t 
@@ -594,6 +592,15 @@ struct Config
 	{
 		Color menu_theme;
 		bool watermark;
+		bool keybinds;
+		float windowsize_x_saved;
+		bool customize_theme;
+		bool blue_theme;
+		bool black_theme;
+		float windowsize_y_saved;
+		float oldwindowsize_x_saved;
+		float oldwindowsize_y_saved;
+		float speed;
 	} menu;
 
 	struct Scripts_t

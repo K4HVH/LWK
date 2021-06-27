@@ -21,14 +21,21 @@ enum FONT_INDEX
 	LOGS,
 	ESP,
 	NAME,
+	BOMB,
+	BOMB1,
 	SUBTABWEAPONS,
 	KNIFES,
 	GRENADES,
 	INDICATORFONT,
 	DAMAGE_MARKER,
+	KEYBINDS,
 	FONT_MAX
 };
-
+enum StringFlags_t {
+	ALIGN_LEFT = 0,
+	ALIGN_RIGHT,
+	ALIGN_CENTER
+};
 extern vgui::HFont fonts[FONT_MAX];
 
 template<typename T>
@@ -53,6 +60,8 @@ public:
 	void rect(int x, int y, int w, int h, Color color);
 	void rect_filled(int x, int y, int w, int h, Color color);
 	void setup_states() const;
+	void draw_arc(int x, int y, int radius, int start_angle, int percent, int thickness, Color color);
+	void keybinds_text(int x, int y, Color color, const char* text, StringFlags_t flags);
 	void invalidate_objects();
 	void restore_objects(LPDIRECT3DDEVICE9 m_device);
 	void gradient(int x, int y, int w, int h, Color first, Color second, GradientType type);

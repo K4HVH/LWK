@@ -7,20 +7,22 @@
 #include "..\visuals\world_esp.h"
 #include "prediction_system.h"
 #include "logs.h"
+#include "..\menu.h"
 
 
-#define VERSION crypt_str("LWK | ")
-
-
+std::string t()
+{
+	return SteamFriends->GetPersonaName();
+}
 void misc::watermark()
 {
 	if (!g_cfg.menu.watermark)
 		return;
 
 	auto width = 0, height = 0;
-	m_engine()->GetScreenSize(width, height); //-V807
+	m_engine()->GetScreenSize(width, height);
 
-	auto watermark = VERSION + g_ctx.username + crypt_str(" | ") + g_ctx.globals.time;
+	auto watermark = crypt_str("LWK / ") + t() + " / " + g_ctx.globals.time;
 
 	if (m_engine()->IsInGame())
 	{
@@ -31,26 +33,21 @@ void misc::watermark()
 			auto server = nci->GetAddress();
 
 			if (!strcmp(server, crypt_str("loopback")))
-				server = crypt_str("Local server");
+				server = crypt_str("local server");
 			else if (m_gamerules()->m_bIsValveDS())
-				server = crypt_str("Valve server");
+				server = crypt_str("valve server");
 
 			auto tickrate = std::to_string((int)(1.0f / m_globals()->m_intervalpertick));
-			watermark = VERSION + g_ctx.username + crypt_str(" | ") + server + crypt_str(" | ") + std::to_string(g_ctx.globals.ping) + crypt_str(" ms | ") + tickrate + crypt_str(" tick | ") + g_ctx.globals.time;
+			watermark = crypt_str("LWK / ") + t() + " / " + server + crypt_str(" / ") + std::to_string(g_ctx.globals.ping) + crypt_str(" ms / ") + tickrate + crypt_str(" tick / ") + g_ctx.globals.time;
 		}
 	}
 
 	auto box_width = render::get().text_width(fonts[NAME], watermark.c_str()) + 10;
 
-	render::get().gradient(width - 10 - box_width, 10, box_width / 2, 1, Color(g_cfg.menu.menu_theme.r(), g_cfg.menu.menu_theme.g(), g_cfg.menu.menu_theme.b(), 170), Color(g_cfg.menu.menu_theme.r(), g_cfg.menu.menu_theme.g(), g_cfg.menu.menu_theme.b(), 240), GRADIENT_HORIZONTAL);
-	render::get().gradient(width - 10 - box_width + (box_width / 2), 10, box_width / 2, 1, Color(g_cfg.menu.menu_theme.r(), g_cfg.menu.menu_theme.g(), g_cfg.menu.menu_theme.b(), 240), Color(g_cfg.menu.menu_theme.r(), g_cfg.menu.menu_theme.g(), g_cfg.menu.menu_theme.b(), 170), GRADIENT_HORIZONTAL);
+	render::get().rect_filled(width - 10 - box_width, 10, box_width, 2, Color(104, 108, 188, 255));
+	render::get().rect_filled(width - 10 - box_width, 11, box_width, 18, Color(15, 15, 62, 150));
 
-	render::get().rect_filled(width - 10 - box_width, 11, box_width, 18, Color(10, 10, 10, 150));
-
-	render::get().text(fonts[NAME], width - 10 - box_width + 5, 20, Color(255, 255, 255, 220), HFONT_CENTERED_Y, watermark.c_str());
-
-	render::get().gradient(width - 10 - box_width, 29, box_width / 2, 1, Color(g_cfg.menu.menu_theme.r(), g_cfg.menu.menu_theme.g(), g_cfg.menu.menu_theme.b(), 170), Color(g_cfg.menu.menu_theme.r(), g_cfg.menu.menu_theme.g(), g_cfg.menu.menu_theme.b(), 240), GRADIENT_HORIZONTAL);
-	render::get().gradient(width - 10 - box_width + (box_width / 2), 29, box_width / 2, 1, Color(g_cfg.menu.menu_theme.r(), g_cfg.menu.menu_theme.g(), g_cfg.menu.menu_theme.b(), 240), Color(g_cfg.menu.menu_theme.r(), g_cfg.menu.menu_theme.g(), g_cfg.menu.menu_theme.b(), 170), GRADIENT_HORIZONTAL);
+	render::get().text(fonts[NAME], width - 10 - box_width + 5, 20, Color(255, 255, 255, 255), HFONT_CENTERED_Y, watermark.c_str());
 }
 
 void misc::NoDuck(CUserCmd* cmd)
@@ -675,49 +672,7 @@ void misc::fast_stop(CUserCmd* m_pcmd)
 	}
 }
 
-void misc::spectators_list()
-{
-	if (!g_cfg.misc.spectators_list)
-		return;
 
-	if (!g_ctx.local()->is_alive())
-		return;
-
-	std::vector <std::string> spectators;
-
-	for (int i = 1; i < m_globals()->m_maxclients; i++)
-	{
-		auto e = static_cast<player_t *>(m_entitylist()->GetClientEntity(i));
-
-		if (!e)
-			continue;
-
-		if (e->is_alive())
-			continue;
-
-		if (e->IsDormant())
-			continue;
-
-		if (e->m_hObserverTarget().Get() != g_ctx.local())
-			continue;
-
-		player_info_t player_info;
-		m_engine()->GetPlayerInfo(i, &player_info);
-
-		spectators.push_back(player_info.szName);
-	}
-
-	for (auto i = 0; i < spectators.size(); i++)
-	{
-		int width, heigth;
-		m_engine()->GetScreenSize(width, heigth);
-
-		auto x = render::get().text_width(fonts[LOGS], spectators.at(i).c_str()) + 6; //-V106
-		auto y = i * 16;
-
-		render::get().text(fonts[LOGS], width - x, g_cfg.menu.watermark ? y + 30 : y + 6, Color::White, HFONT_CENTERED_NONE, spectators.at(i).c_str()); //-V106
-	}
-}
 
 bool misc::double_tap(CUserCmd* m_pcmd)
 {
@@ -934,4 +889,555 @@ void misc::hide_shots(CUserCmd* m_pcmd, bool should_work)
 
 	if (g_ctx.send_packet && !g_ctx.globals.weapon->is_grenade() && weapon_shoot)
 		g_ctx.globals.tickbase_shift = g_ctx.globals.next_tickbase_shift;
+}
+void misc::keybinds()
+{
+	if (!m_engine()->IsInGame() || !m_engine()->IsConnected())
+		return;
+
+	if (!g_cfg.menu.keybinds)
+		return;
+
+	// color_mode.m_gradient
+	const auto freq = 1.f; /// Gradient speed (curr: 100%)
+
+	const auto real_time = m_globals()->m_realtime * freq;
+	const int r = std::floor(std::sin(real_time + 0.f) * 127.f + 128.f);
+	const int g = std::floor(std::sin(real_time + 2.f) * 127.f + 128.f);
+	const int b = std::floor(std::sin(real_time + 4.f) * 127.f + 128.f);
+
+
+	// antiaim inverter
+		// doubletap key
+		// force body
+		// override dmg
+		// thirdperson key
+
+		// antiaim manual
+		// antiaim manual
+		// antiaim manual
+
+	int specs = 0;
+	int modes = 0;
+	std::string spect = "";
+	std::string mode = "";
+
+	if (key_binds::get().get_key_bind_state(16)) {
+		spect += "inverter";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.antiaim.flip_desync.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(18)) {
+		spect += "auto peek";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.misc.automatic_peek.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(20)) {
+		spect += "fakeduck";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.misc.fakeduck_key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(21)) {
+		spect += "slowwalk";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.misc.slowwalk_key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (misc::get().double_tap_key) {
+		spect += "doubletap";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.ragebot.double_tap_key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(17)) {
+		spect += "thirdperson";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.misc.thirdperson_toggle.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(4 + hooks::rage_weapon)) {
+		spect += "damage override";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.ragebot.weapon[hooks::rage_weapon].damage_override_key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(3)) {
+		spect += "safepoint";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.ragebot.safe_point_key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(0)) {
+		spect += "autofire";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.legitbot.autofire_key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+
+	if (key_binds::get().get_key_bind_state(1)) {
+		spect += "legit aim";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.legitbot.key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(19)) {
+		spect += "edge jump";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.misc.edge_jump.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(13) || key_binds::get().get_key_bind_state(14) || key_binds::get().get_key_bind_state(15)) {
+		spect += "manual yaw";
+		spect += "\n";
+		specs++;
+
+
+		mode += "[toggle]";
+
+		mode += "\n";
+		modes++;
+	}
+	if (misc::get().hide_shots_key) {
+		spect += "hide shots";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.antiaim.hide_shots_key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	if (key_binds::get().get_key_bind_state(22)) {
+		spect += "body aim";
+		spect += "\n";
+		specs++;
+
+		switch (g_cfg.ragebot.body_aim_key.mode) {
+		case 0: {
+			mode += "[holding]  ";
+		}break;
+		case 1: {
+			mode += "[toggled]  ";
+		}break;
+		}
+		mode += "\n";
+		modes++;
+	}
+	
+	ImVec2 Pos;
+	ImVec2 size_menu;
+
+	static bool window_set = false;
+	float speed = 10;
+	static bool finish = false;
+	static bool other_bind_pressed = false;
+	static int sub_tabs = false;
+	if (key_binds::get().get_key_bind_state(4 + hooks::rage_weapon) || key_binds::get().get_key_bind_state(16) || key_binds::get().get_key_bind_state(18) || key_binds::get().get_key_bind_state(20)
+		|| key_binds::get().get_key_bind_state(21) || key_binds::get().get_key_bind_state(17) || key_binds::get().get_key_bind_state(22) || key_binds::get().get_key_bind_state(13) || key_binds::get().get_key_bind_state(14) || key_binds::get().get_key_bind_state(15)
+		|| misc::get().double_tap_key || misc::get().hide_shots_key || key_binds::get().get_key_bind_state(0) || key_binds::get().get_key_bind_state(3) || key_binds::get().get_key_bind_state(23))
+		other_bind_pressed = true;
+	else
+		other_bind_pressed = false;
+
+
+	if (g_cfg.menu.windowsize_x_saved != g_cfg.menu.oldwindowsize_x_saved)
+	{
+		if (g_cfg.menu.windowsize_x_saved > g_cfg.menu.oldwindowsize_x_saved)
+		{
+			g_cfg.menu.windowsize_x_saved -= g_cfg.menu.speed;
+		}
+		if (g_cfg.menu.windowsize_x_saved < g_cfg.menu.oldwindowsize_x_saved)
+		{
+			g_cfg.menu.windowsize_x_saved += g_cfg.menu.speed;
+		}
+	}
+	if (g_cfg.menu.windowsize_y_saved != g_cfg.menu.oldwindowsize_y_saved)
+	{
+		if (g_cfg.menu.windowsize_y_saved > g_cfg.menu.oldwindowsize_y_saved)
+		{
+			g_cfg.menu.windowsize_y_saved -= g_cfg.menu.speed;
+		}
+		if (g_cfg.menu.windowsize_y_saved < g_cfg.menu.oldwindowsize_y_saved)
+		{
+			g_cfg.menu.windowsize_y_saved += g_cfg.menu.speed;
+		}
+	}
+	if (g_cfg.menu.windowsize_x_saved == g_cfg.menu.oldwindowsize_x_saved && g_cfg.menu.windowsize_y_saved == g_cfg.menu.oldwindowsize_y_saved)
+	{
+		finish = true;
+	}
+	else
+	{
+		finish = false;
+	}
+
+	if (!g_cfg.antiaim.flip_desync.key || !g_cfg.misc.automatic_peek.key || !g_cfg.misc.fakeduck_key.key || !g_cfg.misc.slowwalk_key.key || !g_cfg.ragebot.double_tap_key.key || !g_cfg.misc.fakeduck_key.key || !g_cfg.misc.thirdperson_toggle.key || !hooks::menu_open)
+	{
+
+		g_cfg.menu.windowsize_x_saved = 0;
+
+		g_cfg.menu.windowsize_y_saved = 0;
+
+	}
+
+	static float alpha_menu = 0.1f;
+
+	if (other_bind_pressed)
+	{
+		if (alpha_menu < 1.f)
+			alpha_menu += 0.05f;
+
+	}
+	else
+	{
+		if (alpha_menu > 0.1f)
+			alpha_menu -= 0.05f;
+
+	}
+
+	ImGuiStyle* Style = &ImGui::GetStyle();
+	Style->FramePadding = ImVec2(1, 1);
+	/*Style->WindowRounding = 0;
+	Style->WindowMinSize = { 1,1 };
+	Style->WindowBorderSize = 1;
+	bool theme = true;
+	Style->Colors[ImGuiCol_WindowBg] = ImColor(33, 33, 33, 215);//zochem? ia zhe ubral bg?
+	Style->Colors[ImGuiCol_ChildBg] = ImColor(21, 20, 21, 255);
+	Style->Colors[ImGuiCol_ResizeGrip] = ImColor(42, 40, 43, 0);
+	Style->Colors[ImGuiCol_ResizeGripHovered] = ImColor(42, 40, 43, 0);
+	Style->Colors[ImGuiCol_ResizeGripActive] = ImColor(42, 40, 43, 0);
+	Style->Colors[ImGuiCol_Border] = ImColor(38, 39, 55, 215);
+	Style->Colors[ImGuiCol_Button] = ImColor(29, 125, 229, 5);
+	Style->Colors[ImGuiCol_ButtonHovered] = ImColor(29, 125, 229, 5);
+	Style->Colors[ImGuiCol_ButtonActive] = ImColor(29, 125, 229, 5);
+	Style->Colors[ImGuiCol_PopupBg] = ImColor(18, 17, 18, 255);
+	Style->FramePadding = ImVec2(1, 1);*/
+	if ((g_cfg.menu.keybinds)) {
+		if ((other_bind_pressed && alpha_menu > 0.1f) || hooks::menu_open) {
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha_menu);
+			if (ImGui::Begin("Keybinds", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
+			{
+				auto b_alpha = alpha_menu;
+				size_menu = ImGui::GetWindowSize();
+				Pos = ImGui::GetWindowPos();
+				auto Render = ImGui::GetWindowDrawList();
+				Render->AddRectFilled({ Pos.x + 0, Pos.y + 0 }, { Pos.x + 220, Pos.y + 23 }, ImColor(15, 15, 62, (int)(b_alpha * 155)));
+				Render->AddRectFilled({ Pos.x + 0, Pos.y + 0 }, { Pos.x + 200, Pos.y + 4 }, ImColor(104, 108, 188, (int)(b_alpha * 255)));
+				ImGui::PushFont(c_menu::get().ico_keybinds);
+				auto icon = ImGui::CalcTextSize("k");
+				Render->AddText({ Pos.x + 55, Pos.y + 5 }, ImColor(255,255,255, (int)(b_alpha * 255)), "k");
+				ImGui::PopFont();
+				//ImGui::PushFont(c_menu::get().futura_small);
+				Render->AddText({ Pos.x + 55 + icon.x + 2, Pos.y + 8 }, ImColor(255, 255, 255, (int)(alpha_menu * 255)), "KeyBinds");
+				if (other_bind_pressed)
+					Render->AddRectFilled({ Pos.x + 0, Pos.y + 23 }, { Pos.x + 200, Pos.y + ImGui::GetWindowSize().y - 10 }, ImColor(15, 15, 62, (int)(b_alpha * 50)), 6);
+
+				//Render->AddLine({ Pos.x + 0, Pos.y + 23 }, { Pos.x + 200, Pos.y + 23 }, ImColor(54, 53, 54, (int)(b_alpha * 255)), 1);
+				if (specs > 0) spect += "\n";
+				if (modes > 0) mode += "\n";
+				ImVec2 size = ImGui::CalcTextSize(spect.c_str());
+				ImVec2 size2 = ImGui::CalcTextSize(mode.c_str());
+				ImGui::SetWindowSize(ImVec2(200, 23 + size.y));
+				ImGui::SetCursorPosY(24);
+				ImGui::Columns(2, "fart1", false);
+
+
+				ImGui::SetColumnWidth(0, 190 - (size2.x + 8));
+				ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, alpha_menu), spect.c_str());
+				ImGui::NextColumn();
+
+				ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, alpha_menu), mode.c_str());
+				ImGui::Columns(1);
+				// ImGui::Separator();
+				//ImGui::PopFont();
+			}
+			ImGui::End();
+			ImGui::PopStyleVar();
+			//	}
+		}
+	}
+}
+
+
+void misc::spectators_list()
+{
+	if (!g_cfg.misc.spectators_list)
+		return;
+
+	if (!g_ctx.local()->is_alive())
+		return;
+
+	// color_mode.m_gradient
+	const auto freq = 1.f; /// Gradient speed (curr: 100%)
+
+	const auto real_time = m_globals()->m_realtime * freq;
+	const int r = std::floor(std::sin(real_time + 0.f) * 127.f + 128.f);
+	const int g = std::floor(std::sin(real_time + 2.f) * 127.f + 128.f);
+	const int b = std::floor(std::sin(real_time + 4.f) * 127.f + 128.f);
+
+	std::vector <std::string> spectators;
+
+
+	int specs = 0;
+	int modes = 0;
+	std::string spect = "";
+	std::string mode = "";
+	ImVec2 Pos;
+	ImVec2 size_menu;
+
+	static bool window_set = false;
+	static float windowsize_x = 0;
+	static float windowsize_y = 0;
+	static float oldwindowsize_x = 300;
+	static float oldwindowsize_y = 300;
+	static float speed = 10;
+	static bool finish = false;
+	static int sub_tabs = false;
+	static float alpha_menu = 0.1f;
+
+
+	if (windowsize_x != oldwindowsize_x)
+	{
+		if (windowsize_x > oldwindowsize_x)
+		{
+			windowsize_x -= speed;
+		}
+		if (windowsize_x < oldwindowsize_x)
+		{
+			windowsize_x += speed;
+		}
+	}
+	if (windowsize_y != oldwindowsize_y)
+	{
+		if (windowsize_y > oldwindowsize_y)
+		{
+			windowsize_y -= speed;
+		}
+		if (windowsize_y < oldwindowsize_y)
+		{
+			windowsize_y += speed;
+		}
+	}
+	if (windowsize_x == oldwindowsize_x && windowsize_y == oldwindowsize_y)
+	{
+		finish = true;
+	}
+	else
+	{
+		finish = false;
+	}
+	for (int i = 1; i < m_globals()->m_maxclients; i++)
+	{
+		auto e = static_cast<player_t*>(m_entitylist()->GetClientEntity(i));
+
+		if (!e)
+			continue;
+
+		if (e->is_alive())
+			continue;
+
+		if (e->IsDormant())
+			continue;
+
+		if (e->m_hObserverTarget().Get() != g_ctx.local())
+			continue;
+
+		player_info_t player_info;
+		m_engine()->GetPlayerInfo(i, &player_info);
+		spect += player_info.szName;
+		spect += "\n";
+		specs++;
+	}
+	ImGuiStyle* Style = &ImGui::GetStyle();
+	Style->FramePadding = ImVec2(1, 1);
+	/*ImGuiStyle* Style = &ImGui::GetStyle();
+	Style->WindowBorderSize = 1;
+	Style->WindowRounding = 0;
+	Style->WindowBorderSize = 1;
+	Style->WindowMinSize = { 1,1 };
+	bool theme = true;
+	Style->Colors[ImGuiCol_WindowBg] = ImColor(33, 33, 33, 215);//zochem? ia zhe ubral bg?
+	Style->Colors[ImGuiCol_ChildBg] = ImColor(21, 20, 21, 255);
+	Style->Colors[ImGuiCol_ResizeGrip] = ImColor(42, 40, 43, 0);
+	Style->Colors[ImGuiCol_ResizeGripHovered] = ImColor(42, 40, 43, 0);
+	Style->Colors[ImGuiCol_ResizeGripActive] = ImColor(42, 40, 43, 0);
+	Style->Colors[ImGuiCol_Border] = ImColor(38, 39, 55, 215);
+	Style->Colors[ImGuiCol_Button] = ImColor(29, 125, 229, 5);
+	Style->Colors[ImGuiCol_ButtonHovered] = ImColor(29, 125, 229, 5);
+	Style->Colors[ImGuiCol_ButtonActive] = ImColor(29, 125, 229, 5);
+	Style->Colors[ImGuiCol_PopupBg] = ImColor(18, 17, 18, 255);
+	Style->FramePadding = ImVec2(1, 1);*/
+	if ((spect.size() > 0) || hooks::menu_open)
+	{
+		if (alpha_menu < 1.f)
+			alpha_menu += 0.05f;
+
+	}
+	else
+	{
+		if (alpha_menu > 0.1f)
+			alpha_menu -= 0.05f;
+
+	}
+	if ((g_cfg.misc.spectators_list)) {
+		if ((spect.size() > 0 && alpha_menu > 0.1f) || hooks::menu_open) {
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha_menu);
+			if (ImGui::Begin("Spectator list", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar))
+			{
+				auto b_alpha = alpha_menu;
+				size_menu = ImGui::GetWindowSize();
+				Pos = ImGui::GetWindowPos();
+				auto Render = ImGui::GetWindowDrawList();
+				Render->AddRectFilled({ Pos.x + 0, Pos.y + 0 }, { Pos.x + 220, Pos.y + 23 }, ImColor(15, 15, 62, (int)(b_alpha * 155)));
+				Render->AddRectFilled({ Pos.x + 0, Pos.y + 0 }, { Pos.x + 200, Pos.y + 4 }, ImColor(104, 108, 188, (int)(b_alpha * 255)));
+				ImGui::PushFont(c_menu::get().ico_keybinds);
+				auto icon = ImGui::CalcTextSize("W");
+				Render->AddText({ Pos.x + 55, Pos.y + 5 }, ImColor(255,255,255, (int)(b_alpha * 255)), "W");
+				ImGui::PopFont();
+				//ImGui::PushFont(c_menu::get().futura_small);
+				Render->AddText({ Pos.x + 55 + icon.x + 2, Pos.y + 8 }, ImColor(255, 255, 255, (int)(alpha_menu * 255)), "Spectators");
+				if (spect.size() > 0)
+					Render->AddRectFilled({ Pos.x + 0, Pos.y + 23 }, { Pos.x + 200, Pos.y + ImGui::GetWindowSize().y - 9 }, ImColor(104, 108, 188, (int)(b_alpha * 50)), 6);
+				if (specs > 0) spect += "\n";
+				if (modes > 0) mode += "\n";
+				ImVec2 size = ImGui::CalcTextSize(spect.c_str());
+				ImVec2 size2 = ImGui::CalcTextSize(mode.c_str());
+				ImGui::SetWindowSize(ImVec2(200, 23 + size.y));
+				ImGui::SetCursorPosY(25);
+				ImGui::Columns(2, "fart1", false);
+
+
+				ImGui::SetColumnWidth(0, 190 - (size2.x + 8));
+				ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, alpha_menu), spect.c_str());
+				ImGui::NextColumn();
+
+				ImGui::TextColored(ImVec4(1.f, 1.f, 1.f, alpha_menu), mode.c_str());
+				ImGui::Columns(1);
+				// ImGui::Separator();
+				//ImGui::PopFont();
+			}
+			ImGui::End();
+			ImGui::PopStyleVar();
+			//	}
+		}
+	}
 }

@@ -79,7 +79,7 @@ public:
 	CSGameRulesProxy * m_gamerules();
 	ILocalize * m_localize();
 	IBaseFileSystem* m_basefilesys();
-
+	IEngineTool* m_enginetool();
 	DWORD m_postprocessing();
 	DWORD m_ccsplayerrenderablevftable();
 private:
@@ -116,7 +116,7 @@ private:
 	CSGameRulesProxy * p_gamerules = nullptr;
 	ILocalize * p_localize = nullptr;
 	IBaseFileSystem* p_basefilesys = nullptr;
-
+	IEngineTool* p_enginetool = nullptr;
 	DWORD p_postprocessing = 0;
 	DWORD p_ccsplayerrenderablevftable = 0;
 };

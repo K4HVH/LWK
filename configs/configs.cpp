@@ -114,13 +114,13 @@ void C_ConfigManager::setup()
 
 	for (auto i = 0; i < 4; i++)
 	{
-		setup_item(&g_cfg.antiaim.pitch, 0, std::to_string(i) + crypt_str("Antiaim.pitch"));
+		setup_item(&g_cfg.antiaim.type[i].pitch, 0, std::to_string(i) + crypt_str("Antiaim.pitch"));
 		setup_item(&g_cfg.antiaim.type[i].base_angle, 0, std::to_string(i) + crypt_str("Antiaim.base_angle"));
-		setup_item(&g_cfg.antiaim.yaw, 0, std::to_string(i) + crypt_str("Antiaim.yaw"));
+		setup_item(&g_cfg.antiaim.type[i].yaw, 0, std::to_string(i) + crypt_str("Antiaim.yaw"));
 		setup_item(&g_cfg.antiaim.type[i].range, 1, std::to_string(i) + crypt_str("Antiaim.range"));
 		setup_item(&g_cfg.antiaim.type[i].speed, 1, std::to_string(i) + crypt_str("Antiaim.speed"));
 		setup_item(&g_cfg.antiaim.type[i].desync, 0, std::to_string(i) + crypt_str("Antiaim.desync"));
-		setup_item(&g_cfg.antiaim.desync_range, 60, std::to_string(i) + crypt_str("Antiaim.desync_range"));
+		setup_item(&g_cfg.antiaim.type[i].desync_range, 60, std::to_string(i) + crypt_str("Antiaim.desync_range"));
 		setup_item(&g_cfg.antiaim.type[i].inverted_desync_range, 60, std::to_string(i) + crypt_str("Antiaim.inverted_desync_range"));
 		setup_item(&g_cfg.antiaim.type[i].body_lean, 0, std::to_string(i) + crypt_str("Antiaim.body_lean"));
 		setup_item(&g_cfg.antiaim.type[i].inverted_body_lean, 0, std::to_string(i) + crypt_str("Antiaim.inverted_body_lean"));
@@ -329,6 +329,7 @@ void C_ConfigManager::setup()
 
 	setup_item(&g_cfg.menu.menu_theme, Color(126, 131, 219), crypt_str("Menu.menu_color"));
 	setup_item(&g_cfg.menu.watermark, false, crypt_str("Menu.watermark"));
+	setup_item(&g_cfg.menu.keybinds, false, crypt_str("Menu.keybinds"));
 
 	setup_item(&g_cfg.scripts.scripts, crypt_str("Scripts.loaded"));
 }

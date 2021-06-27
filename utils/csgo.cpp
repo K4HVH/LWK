@@ -306,6 +306,14 @@ IBaseFileSystem* C_CSGO::m_basefilesys() {
 	return p_basefilesys;
 }
 
+IEngineTool* C_CSGO::m_enginetool()
+{
+	if (!p_enginetool)
+		p_enginetool = get_interface< IEngineTool >("engine.dll", "VENGINETOOL003"); //newest from csgo sdk
+
+	return p_enginetool;
+}
+
 ILocalize * C_CSGO::m_localize() 
 {
 	if (!p_localize)

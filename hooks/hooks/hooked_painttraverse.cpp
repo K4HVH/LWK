@@ -153,12 +153,16 @@ void __fastcall hooks::hooked_painttraverse(void* ecx, void* edx, vgui::VPANEL p
 
 		fonts[LOGS] = create_font(crypt_str("Lucida Console"), 10, FW_MEDIUM, FONTFLAG_DROPSHADOW);
 		fonts[ESP] = create_font(crypt_str("Smallest Pixel-7"), 11, FW_MEDIUM, FONTFLAG_OUTLINE);
+		fonts[BOMB1] = create_font(crypt_str("Verdana"), 25, FW_MEDIUM, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+		fonts[BOMB] = create_font(crypt_str("undefeated"), 40, FW_MEDIUM, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 		fonts[NAME] = create_font(crypt_str("Verdana"), 12, FW_MEDIUM, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 		fonts[SUBTABWEAPONS] = create_font(crypt_str("undefeated"), 13, FW_MEDIUM, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 		fonts[KNIFES] = create_font(crypt_str("icomoon"), 13, FW_MEDIUM, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 		fonts[GRENADES] = create_font(crypt_str("undefeated"), 20, FW_MEDIUM, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 		fonts[INDICATORFONT] = create_font(crypt_str("Verdana"), 25, FW_HEAVY, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 		fonts[DAMAGE_MARKER] = create_font(crypt_str("Verdana"), 16, FW_HEAVY, FONTFLAG_OUTLINE);
+		fonts[KEYBINDS] = create_font(crypt_str("Verdana"), 12, 100, FONTFLAG_DROPSHADOW | FONTFLAG_ANTIALIAS);
+
 
 		g_ctx.last_font_name.clear();
 	}
@@ -253,7 +257,7 @@ void __fastcall hooks::hooked_painttraverse(void* ecx, void* edx, vgui::VPANEL p
 			otheresp::get().automatic_peek_indicator();
 
 			misc::get().ChatSpamer();
-			misc::get().spectators_list();
+			//misc::get().spectators_list();
 
 			bullettracers::get().draw_beams();
 		}

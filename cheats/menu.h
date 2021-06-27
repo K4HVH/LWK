@@ -5,22 +5,25 @@ class c_menu : public singleton<c_menu> {
 public:
 	void draw( bool is_open );
 	void menu_setup(ImGuiStyle &style);
-
+	void draw_indicators();	
 	float dpi_scale = 1.f;
 
 	ImFont* futura;
 	ImFont* futura_large;
 	ImFont* futura_small;
-
+	ImFont* astrium;
 	ImFont* gotham;
 	ImFont* whitney;
 	ImFont* whitney_small;
 	ImFont* whitney_med;
+	IDirect3DTexture9** friends_images;
+	LPDIRECT3DTEXTURE9 steam_image();
+	LPDIRECT3DTEXTURE9 steam_image_friends(CSteamID SteamId);
 
 	ImFont* ico_menu;
 	ImFont* ico_bottom;
 	ImFont* ico_menu_new;
-
+	ImFont* ico_keybinds;
 	float public_alpha;
 	IDirect3DDevice9* device;
 	float color_buffer[4] = { 1.f, 1.f, 1.f, 1.f };
@@ -55,7 +58,7 @@ private:
 
 	int active_tab_index;
 	ImGuiStyle style;
-	int width = 850, height = 560;
+	int width = 750, height = 580;
 	float child_height;
 
 	float preview_alpha = 1.f;
@@ -73,7 +76,7 @@ private:
 	void draw_ragebot(int child);
 	void draw_tabs_ragebot();
 
-	void draw_legit(int child);
+	void draw_legit();
 	 
 	void draw_visuals(int child);
 	void draw_tabs_visuals();
@@ -93,3 +96,5 @@ private:
 
 	std::string preview = crypt_str("None");
 };
+
+inline c_menu cummenu;

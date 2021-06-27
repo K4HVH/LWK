@@ -26,6 +26,28 @@ void render::rect(int x, int y, int w, int h, Color color)
 	m_surface()->DrawSetColor(color);
 	m_surface()->DrawOutlinedRect(x, y, x + w, y + h);
 }
+void render::keybinds_text(int x, int y, Color color, const char* text, StringFlags_t flags /*= render::ALIGN_LEFT */) {
+	int w, h;
+	va_list va_alist;
+	char buffer[1024];
+	va_start(va_alist, text);
+	_vsnprintf(buffer, sizeof(buffer), text, va_alist);
+	va_end(va_alist);
+	wchar_t wbuf[1024];
+
+	MultiByteToWideChar(CP_UTF8, 0, buffer, 256, wbuf, 256);
+	m_surface()->GetTextSize(fonts[KEYBINDS], wbuf, w, h);
+	m_surface()->DrawSetTextFont(fonts[KEYBINDS]);
+	m_surface()->DrawSetTextColor(color);
+
+	if (flags & ALIGN_RIGHT)
+		x -= w;
+	if (flags & ALIGN_CENTER)
+		x -= w / 2;
+
+	m_surface()->DrawSetTextPos(x, y);
+	m_surface()->DrawPrintText(wbuf, wcslen(wbuf));
+}
 
 void render::rect_filled(int x, int y, int w, int h, Color color)
 {
@@ -71,7 +93,27 @@ void render::invalidate_objects()
 {
 	this->device = nullptr;
 }
+void render::draw_arc(int x, int y, int radius, int start_angle, int percent, int thickness, Color color)
+{
+	float precision = (2 * 3.14159265358979) / 180;
+	float step = 3.14159265358979 / 180;
+	float inner = radius - thickness;
+	float end_angle = (start_angle + percent) * step;
+	float start_angle1337 = (start_angle * 3.14159265358979) / 180;
 
+	for (; radius > inner; --radius) {
+		for (float angle = start_angle1337; angle < end_angle; angle += precision) {
+			float cx = round(x + radius * cos(angle));
+			float cy = round(y + radius * sin(angle));
+
+			float cx2 = round(x + radius * cos(angle + precision));
+			float cy2 = round(y + radius * sin(angle + precision));
+
+			m_surface()->DrawSetColor(color);
+			m_surface()->DrawLine(cx, cy, cx2, cy2);
+		}
+	}
+}
 void render::restore_objects(LPDIRECT3DDEVICE9 device)
 {
 	this->device = device;
