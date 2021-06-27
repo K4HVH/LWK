@@ -4,7 +4,9 @@
 
 Discord: https://discord.gg/uAsanYpP9G
 
-![alt text](https://i.imgur.com/H4aAxYA.gif)
+DLL: https://anonfiles.com/v1Teu636u1/LWK_dll
+
+![alt text](https://i.imgur.com/JK0lL5R.gif)
 
 Update V1.2 (27/06/2021)\
 -Implemented Steam API\
