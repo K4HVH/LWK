@@ -10,7 +10,7 @@ DLL: https://anonfiles.com/v1Teu636u1/LWK_dll
 
 Update V1.2 (27/06/2021)\
 -Implemented Steam API\
--Redesinged some menu aspects\
+-Redesigned some menu aspects\
 -Fixed some values not saving in CFG\
 -Redesigned Smoke and Molotov\
 -Added Bomb Timer\
