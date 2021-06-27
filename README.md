@@ -6,6 +6,14 @@ Discord: https://discord.gg/uAsanYpP9G
 
 ![alt text](https://i.imgur.com/H4aAxYA.gif)
 
+Update V1.2 (27/06/2021)\
+-Implemented Steam API\
+-Redesinged some menu aspects\
+-Fixed some values not saving in CFG\
+-Redesigned Smoke and Molotov\
+-Added Bomb Timer\
+-Cleaned up Menu code
+
 Update V1.1.1 (25/05/2021)\
 -Fixed Smoke Timer\
 -Fixed issue with grenades rendering incorrectly\
