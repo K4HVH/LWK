@@ -18,7 +18,7 @@ public:
 	{
 		using IKDestructor = void(__thiscall*)(CIKContext*);
 		static auto ik_dector = (IKDestructor)util::FindSignature(crypt_str("client.dll"), crypt_str("56 8B F1 57 8D 8E ?? ?? ?? ?? E8 ?? ?? ?? ?? 8D 8E ?? ?? ?? ?? E8 ?? ?? ?? ?? 83 BE ?? ?? ?? ?? ??"));
-		
+
 		ik_dector(this);
 	}
 
@@ -36,8 +36,7 @@ public:
 				*target = -9999;
 				target += 85;
 				++i;
-			} 
-			while (i < count);
+			} while (i < count);
 		}
 	}
 
@@ -73,7 +72,7 @@ struct CBoneSetup
 	float* m_flPoseParameter;
 	void* m_pPoseDebugger;
 
-	void InitPose(Vector pos[], Quaternion q[], CStudioHdr* hdr) 
+	void InitPose(Vector pos[], Quaternion q[], CStudioHdr* hdr)
 	{
 		static auto init_pose = util::FindSignature("client.dll", "55 8B EC 83 EC 10 53 8B D9 89 55 F8 56 57 89 5D F4 8B 0B 89 4D F0");
 
@@ -98,7 +97,7 @@ struct CBoneSetup
 		return accumulate_pose(this, pos, q, sequence, cycle, flWeight, flTime, pIKContext);
 	}
 
-	void CalcAutoplaySequences(Vector pos[], Quaternion q[], float flRealTime, CIKContext* pIKContext) 
+	void CalcAutoplaySequences(Vector pos[], Quaternion q[], float flRealTime, CIKContext* pIKContext)
 	{
 		static auto calc_autoplay_sequences = util::FindSignature(crypt_str("client.dll"), crypt_str("55 8B EC 83 EC 10 53 56 57 8B 7D 10 8B D9 F3 0F 11 5D ??"));
 
@@ -133,18 +132,18 @@ struct CBoneSetup
 	}
 };
 
-uintptr_t& GetBoneMerge(player_t* player) 
+uintptr_t& GetBoneMerge(player_t* player)
 {
 	static auto bone_merge = util::FindSignature(crypt_str("client.dll"), crypt_str("89 86 ?? ?? ?? ?? E8 ?? ?? ?? ?? FF 75 08"));
 	return *(uintptr_t*)((uintptr_t)player + *(uintptr_t*)(bone_merge + 0x2));
 }
 
-struct mstudioposeparamdesc_t 
+struct mstudioposeparamdesc_t
 {
 	int sznameindex;
 
 	inline char* const pszName(void) const
-	{ 
+	{
 		return ((char*)this) + sznameindex;
 	}
 
@@ -154,7 +153,7 @@ struct mstudioposeparamdesc_t
 	float loop;
 };
 
-mstudioposeparamdesc_t* pPoseParameter(CStudioHdr* hdr, int index) 
+mstudioposeparamdesc_t* pPoseParameter(CStudioHdr* hdr, int index)
 {
 	using poseParametorFN = mstudioposeparamdesc_t * (__thiscall*)(CStudioHdr*, int);
 	static poseParametorFN pose_parameter = (poseParametorFN)util::FindSignature(crypt_str("client.dll"), crypt_str("55 8B EC 8B 45 08 57 8B F9 8B 4F 04 85 C9 75 15 8B"));
@@ -174,7 +173,7 @@ void UpdateCache(uintptr_t bonemerge)
 	bone_merge_update_cache(bonemerge);
 }
 
-float GetPoseParamValue(CStudioHdr* hdr, int index, float flValue) 
+float GetPoseParamValue(CStudioHdr* hdr, int index, float flValue)
 {
 	if (index < 0 || index > 24)
 		return 0.0f;
@@ -197,18 +196,18 @@ float GetPoseParamValue(CStudioHdr* hdr, int index, float flValue)
 	return (flValue - PoseParam.start) / (PoseParam.end - PoseParam.start);
 }
 
-void MergeMatchingPoseParams(uintptr_t bonemerge, float* poses, float* target_poses) 
+void MergeMatchingPoseParams(uintptr_t bonemerge, float* poses, float* target_poses)
 {
 	UpdateCache(bonemerge);
 
-	if (*(DWORD*)(bonemerge + 0x10) && *(DWORD*)(bonemerge + 0x8C)) 
+	if (*(DWORD*)(bonemerge + 0x10) && *(DWORD*)(bonemerge + 0x8C))
 	{
 		auto index = (int*)(bonemerge + 0x20);
 		auto counter = 0;
 
-		do 
+		do
 		{
-			if (*index != -1) 
+			if (*index != -1)
 			{
 				auto target = *(player_t**)(bonemerge + 0x4);
 				auto hdr = target->m_pStudioHdr();
@@ -230,8 +229,7 @@ void MergeMatchingPoseParams(uintptr_t bonemerge, float* poses, float* target_po
 
 			++counter;
 			++index;
-		} 
-		while (counter < 24);
+		} while (counter < 24);
 	}
 }
 
@@ -260,7 +258,7 @@ void CSetupBones::setup()
 		m_pIk->UpdateTargets(m_vecBones, m_quatBones, m_boneMatrix, (uint8_t*)bone_computed);
 
 		using oCalculateIKLocks = void(__thiscall*)(void*, float);
-		call_virtual <oCalculateIKLocks> (m_animating, 192)(m_animating, m_flCurtime);
+		call_virtual <oCalculateIKLocks>(m_animating, 192)(m_animating, m_flCurtime);
 
 		m_pIk->SolveDependencies(m_vecBones, m_quatBones, m_boneMatrix, (uint8_t*)bone_computed);
 	}
@@ -286,7 +284,7 @@ void CSetupBones::setup()
 	m_animating->m_iMostRecentModelBoneCounter() = *(uint32_t*)model_bone_counter;
 }
 
-bool CanBeAnimated(player_t* player) 
+bool CanBeAnimated(player_t* player)
 {
 	static auto custom_player = *(int*)(util::FindSignature(crypt_str("client.dll"), crypt_str("80 BF ?? ?? ?? ?? ?? 0F 84 ?? ?? ?? ?? 83 BF ?? ?? ?? ?? ?? 74 7C")) + 2);
 
@@ -333,7 +331,7 @@ void CSetupBones::get_skeleton()
 		m_nAnimOverlayCount
 	};
 
-	for (auto i = 0; i < m_nAnimOverlayCount; ++i) 
+	for (auto i = 0; i < m_nAnimOverlayCount; ++i)
 	{
 		auto& final_layer = m_animLayers[i];
 
@@ -352,15 +350,15 @@ void CSetupBones::get_skeleton()
 
 	auto weapon = m_animating->m_hActiveWeapon().Get();
 
-	if (CanBeAnimated(m_animating) && weapon) 
+	if (CanBeAnimated(m_animating) && weapon)
 	{
 		auto weaponWorldModel = (player_t*)weapon->m_hWeaponWorldModel().Get();
 
-		if (weaponWorldModel) 
+		if (weaponWorldModel)
 		{
 			auto bone_merge = GetBoneMerge(weaponWorldModel);
 
-			if (bone_merge) 
+			if (bone_merge)
 			{
 				MergeMatchingPoseParams(bone_merge, m_flWorldPoses, m_flPoseParameters);
 				auto world_hdr = weaponWorldModel->m_pStudioHdr();
@@ -378,21 +376,21 @@ void CSetupBones::get_skeleton()
 
 				world_setup->InitPose(position, rotation, world_hdr);
 
-				for (auto i = 0; i < m_nAnimOverlayCount; ++i) 
+				for (auto i = 0; i < m_nAnimOverlayCount; ++i)
 				{
 					auto layer = &m_animLayers[i];
 
-					if (layer && layer->m_nSequence > 1 && layer->m_flWeight > 0.0f) 
+					if (layer && layer->m_nSequence > 1 && layer->m_flWeight > 0.0f)
 					{
-						if (m_bShouldDispatch && m_animating == g_ctx.local()) 
+						if (m_bShouldDispatch && m_animating == g_ctx.local())
 						{
 							using UpdateDispatchLayer = void(__thiscall*)(void*, AnimationLayer*, CStudioHdr*, int);
-							call_virtual <UpdateDispatchLayer> (m_animating, 246)(m_animating, layer, world_hdr, layer->m_nSequence);
+							call_virtual <UpdateDispatchLayer>(m_animating, 246)(m_animating, layer, world_hdr, layer->m_nSequence);
 						}
 
 						if (!m_bShouldDispatch || layer->m_nDispatchSequence_2 <= 0 || layer->m_nDispatchSequence_2 >= (*(studiohdr_t**)world_hdr)->numlocalseq)
 							bone_setup->AccumulatePose(m_vecBones, m_quatBones, layer->m_nSequence, layer->m_flCycle, layer->m_flWeight, m_flCurtime, m_pIk);
-						else if (m_bShouldDispatch) 
+						else if (m_bShouldDispatch)
 						{
 							bone_merge_copy_from_follow(bone_merge, m_vecBones, m_quatBones, BONE_USED_BY_BONE_MERGE, position, rotation);
 
@@ -401,7 +399,7 @@ void CSetupBones::get_skeleton()
 
 							if (m_pIk)
 								(oIKAddDependencies(add_dependencies) (m_pIk, *(float*)((uintptr_t)m_animating + 0xA14), layer->m_nSequence, layer->m_flCycle, bone_setup->m_flPoseParameter[2], layer->m_flWeight));
-							
+
 							world_setup->AccumulatePose(position, rotation, layer->m_nDispatchSequence_2, layer->m_flCycle, layer->m_flWeight, m_flCurtime, world_ik);
 							bone_merge_copy_to_follow(bone_merge, position, rotation, BONE_USED_BY_BONE_MERGE, m_vecBones, m_quatBones);
 						}
@@ -414,11 +412,11 @@ void CSetupBones::get_skeleton()
 	}
 	else
 	{
-		for (auto i = 0; i < m_nAnimOverlayCount; ++i) 
+		for (auto i = 0; i < m_nAnimOverlayCount; ++i)
 		{
 			auto layer_count = layer[i];
 
-			if (layer_count >= 0 && layer_count < m_nAnimOverlayCount) 
+			if (layer_count >= 0 && layer_count < m_nAnimOverlayCount)
 			{
 				auto final_layer = &m_animLayers[i];
 				bone_setup->AccumulatePose(position, rotation, final_layer->m_nSequence, final_layer->m_flCycle, final_layer->m_flWeight, m_flCurtime, m_pIk);
@@ -426,7 +424,7 @@ void CSetupBones::get_skeleton()
 		}
 	}
 
-	if (m_pIk) 
+	if (m_pIk)
 	{
 		world_ik->Construct();
 		world_ik->Init(m_pHdr, &m_angAngles, &m_vecOrigin, m_flCurtime, 0, m_boneMask);
@@ -439,7 +437,7 @@ void CSetupBones::get_skeleton()
 	bone_setup->CalcBoneAdj(m_vecBones, m_quatBones, (float*)((uintptr_t)m_animating + 0xA54), m_boneMask);
 }
 
-void CSetupBones::studio_build_matrices(CStudioHdr* hdr, const matrix3x4_t& rotationmatrix, Vector* pos, Quaternion* q, int boneMask, matrix3x4_t* bonetoworld, uint32_t* boneComputed) 
+void CSetupBones::studio_build_matrices(CStudioHdr* hdr, const matrix3x4_t& rotationmatrix, Vector* pos, Quaternion* q, int boneMask, matrix3x4_t* bonetoworld, uint32_t* boneComputed)
 {
 	auto i = 0;
 	auto chain_length = 0;
@@ -461,7 +459,7 @@ void CSetupBones::studio_build_matrices(CStudioHdr* hdr, const matrix3x4_t& rota
 		for (i = 0; i < studio_hdr->numbones; ++i)
 			chain[chain_length - i - 1] = i;
 	}
-	else 
+	else
 	{
 		i = bone;
 
@@ -469,13 +467,12 @@ void CSetupBones::studio_build_matrices(CStudioHdr* hdr, const matrix3x4_t& rota
 		{
 			chain[chain_length++] = i;
 			i = bone_parent->m_Memory.Element(i);
-		}
-		while (i != -1);
+		} while (i != -1);
 	}
 
 	matrix3x4_t bone_matrix;
 
-	for (auto j = chain_length - 1; j >= 0; --j) 
+	for (auto j = chain_length - 1; j >= 0; --j)
 	{
 		i = chain[j];
 
@@ -485,7 +482,7 @@ void CSetupBones::studio_build_matrices(CStudioHdr* hdr, const matrix3x4_t& rota
 		auto flag = bone_flags->m_Memory.Element(i);
 		auto parent = bone_parent->m_Memory.Element(i);
 
-		if (flag & boneMask && q) 
+		if (flag & boneMask && q)
 		{
 			bone_matrix.QuaternionMatrix(q[i], pos[i]);
 
@@ -497,7 +494,7 @@ void CSetupBones::studio_build_matrices(CStudioHdr* hdr, const matrix3x4_t& rota
 	}
 }
 
-void CSetupBones::attachment_helper() 
+void CSetupBones::attachment_helper()
 {
 	using AttachmentHelperFn = void(__thiscall*)(player_t*, CStudioHdr*);
 	static auto m_AttachmentHelper = util::FindSignature(crypt_str("client.dll"), crypt_str("55 8B EC 83 EC 48 53 8B 5D 08 89 4D F4"));

@@ -132,8 +132,8 @@ void playeresp::paint_traverse()
 
 				draw_skeleton(e, color, record->matrixes_data.main);
 				draw_skeleton(e, Color::Red, record->matrixes_data.zero);
-				draw_skeleton(e, Color::Green, record->matrixes_data.first);
-				draw_skeleton(e, Color::Blue, record->matrixes_data.second);
+				draw_skeleton(e, Color::Green, record->matrixes_data.negative);
+				draw_skeleton(e, Color::Blue, record->matrixes_data.positive);
 			}
 			else
 				draw_skeleton(e, color, e->m_CachedBoneData().Base());

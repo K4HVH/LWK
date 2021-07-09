@@ -5,6 +5,8 @@
 
 void local_animations::run(ClientFrameStage_t stage)
 {
+	if (m_clientstate()->iDeltaTick == -1) return;
+
 	if (!fakelag::get().condition && key_binds::get().get_key_bind_state(20))
 	{
 		if (stage == FRAME_NET_UPDATE_END)

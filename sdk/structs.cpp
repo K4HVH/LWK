@@ -333,11 +333,11 @@ int weapon_t::get_max_tickbase_shift()
 		max_tickbase_shift = 9;
 		break;
 	case WEAPON_DEAGLE:
-		max_tickbase_shift = 14;
+		max_tickbase_shift = 13;
 		break;
 	case WEAPON_G3SG1:
 	case WEAPON_SCAR20:
-		max_tickbase_shift = 14;
+		max_tickbase_shift = 13;
 		break;
 	}
 
@@ -599,6 +599,14 @@ Vector player_t::get_shoot_position()
 	return shoot_position;
 }
 
+AnimationLayer* player_t::GetAnimOverlay(int index)
+{
+	if (index < 15)
+		return &get_animlayers()[index];
+	else
+		return nullptr;
+}
+
 void player_t::modify_eye_position(Vector& eye_position)
 {
 	if (!this)
@@ -669,6 +677,28 @@ int player_t::get_hitbox_bone_id(int hitbox_id)
 		return -1;
 
 	return hitbox->bone;
+}
+
+Vector player_t::GetBonePos(int bone)
+{
+	matrix3x4_t boneMatrix[MAXSTUDIOBONES];
+	if (SetupBones(boneMatrix, MAXSTUDIOBONES, BONE_USED_BY_ANYTHING, 0.0f)) {
+		return boneMatrix[bone].at(3);
+	}
+	return Vector{};
+}
+
+bool player_t::CanSeePlayer(player_t* player, const Vector& pos)
+{
+	CGameTrace tr;
+	Ray_t ray;
+	CTraceFilter filter;
+	filter.pSkip = this;
+
+	ray.Init(get_shoot_position(), pos);
+	m_trace()->TraceRay(ray, MASK_SHOT | CONTENTS_GRATE, &filter, &tr);
+
+	return tr.hit_entity == player || tr.fraction > 0.97f;
 }
 
 Vector player_t::hitbox_position(int hitbox_id)
