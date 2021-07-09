@@ -4,7 +4,7 @@
 
 Discord: https://discord.gg/uAsanYpP9G
 
-DLL: https://anonfiles.com/f4sau857u1/LWK_dll
+DLL: https://anonfiles.com/f4sau857u1/LWK_dll \
 CFG: https://anonfiles.com/hfseua53ue/hvh_ob
 
 ![alt text](https://i.imgur.com/JK0lL5R.gif)
