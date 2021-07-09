@@ -100,14 +100,6 @@ IBaseClientDLL * C_CSGO::m_client() {
 	return p_client;
 }
 
-IWeaponSystem* C_CSGO::m_WeaponSystem()
-{
-	if (p_WeaponSystem == nullptr)
-		p_WeaponSystem = *reinterpret_cast<IWeaponSystem**>(util::FindSignature("client.dll", "8B 35 ? ? ? ? FF 10 0F B7 C0") + 0x2);
-
-	return p_WeaponSystem;
-}
-
 IClientEntityList * C_CSGO::m_entitylist() {
 	if (!p_entitylist)
 		p_entitylist = get_interface<IClientEntityList>(crypt_str("client.dll"), crypt_str("VClientEntityList"));

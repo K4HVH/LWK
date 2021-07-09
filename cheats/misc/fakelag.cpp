@@ -73,16 +73,7 @@ void fakelag::Fakelag(CUserCmd* m_pcmd)
 		max_choke = m_engine()->IsVoiceRecording() ? 1 : min(max_choke, 6);
 
 	if (misc::get().recharging_double_tap)
-	{
-		if (g_cfg.ragebot.slow_teleport) {
-			auto max_tickbase_shift = m_gamerules()->m_bIsValveDS() ? 6 : 19;
-			max_choke = 0;
-		}
-		else {
-			auto max_tickbase_shift = m_gamerules()->m_bIsValveDS() ? 6 : 19;
-			max_choke = min(13, max_tickbase_shift);
-		}
-	}
+		max_choke = g_ctx.globals.weapon->get_max_tickbase_shift();
 
 	if (g_ctx.local()->m_fFlags() & FL_ONGROUND && engineprediction::get().backup_data.flags & FL_ONGROUND && !m_gamerules()->m_bIsValveDS() && key_binds::get().get_key_bind_state(20)) //-V807
 	{

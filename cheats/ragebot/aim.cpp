@@ -258,8 +258,6 @@ void aim::scan_targets()
 
 	for (auto& target : targets)
 	{
-		if (!target.e->is_alive() || target.e == nullptr) continue;
-
 		if (target.history_record->valid())
 		{
 			scan_data last_data;
@@ -386,7 +384,7 @@ void aim::scan(adjust_data* record, scan_data& data, const Vector& shoot_positio
 	if (!weapon_info)
 		return;
 
-	auto hitboxes = get_hitboxes(record, true);
+	auto hitboxes = get_hitboxes(record, optimized);
 
 	if (hitboxes.empty())
 		return;
@@ -433,13 +431,13 @@ void aim::scan(adjust_data* record, scan_data& data, const Vector& shoot_positio
 			{
 				auto safe = 0.0f;
 
-				if (record->matrixes_data.zero[0].GetOrigin() == record->matrixes_data.negative[0].GetOrigin() || record->matrixes_data.zero[0].GetOrigin() == record->matrixes_data.positive[0].GetOrigin() || record->matrixes_data.negative[0].GetOrigin() == record->matrixes_data.positive[0].GetOrigin())
+				if (record->matrixes_data.zero[0].GetOrigin() == record->matrixes_data.first[0].GetOrigin() || record->matrixes_data.zero[0].GetOrigin() == record->matrixes_data.second[0].GetOrigin() || record->matrixes_data.first[0].GetOrigin() == record->matrixes_data.second[0].GetOrigin())
 					safe = 0.0f;
 				else if (!hitbox_intersection(record->player, record->matrixes_data.zero, hitbox, shoot_position, point.point, &safe))
 					safe = 0.0f;
-				else if (!hitbox_intersection(record->player, record->matrixes_data.negative, hitbox, shoot_position, point.point, &safe))
+				else if (!hitbox_intersection(record->player, record->matrixes_data.first, hitbox, shoot_position, point.point, &safe))
 					safe = 0.0f;
-				else if (!hitbox_intersection(record->player, record->matrixes_data.positive, hitbox, shoot_position, point.point, &safe))
+				else if (!hitbox_intersection(record->player, record->matrixes_data.second, hitbox, shoot_position, point.point, &safe))
 					safe = 0.0f;
 
 				point.safe = safe;
@@ -881,16 +879,14 @@ void aim::fire(CUserCmd* cmd)
 		{
 		case ORIGINAL:
 			return crypt_str("Class ");
-		case FIRST2:
-			return crypt_str("First ");
-		case SECOND2:
-			return crypt_str("Second ");
-		case THIRD:
-			return crypt_str("Third ");
-		case LOW_FIRST:
-			return crypt_str("F Low ");
-		case LOW_SECOND:
-			return crypt_str("S Low ");
+		case BRUTEFORCE:
+			return crypt_str("Brute ");
+		case LBY:
+			return crypt_str("LBY ");
+		case TRACE:
+			return crypt_str("Traced ");
+		case DIRECTIONAL:
+			return crypt_str("Detect ");
 		}
 	};
 
@@ -905,8 +901,8 @@ void aim::fire(CUserCmd* cmd)
 
 	log << crypt_str("(HC: ") + (final_hitchance == 101 ? crypt_str("MA") : std::to_string(final_hitchance)) + crypt_str(" / ");
 	log << crypt_str("SP: ") + std::to_string((bool)final_target.data.point.safe) + crypt_str(" / ");
-	log << crypt_str("BT: ") + std::to_string(backtrack_ticks) + crypt_str("");
-	log << /*crypt_str("R: ") + get_resolver_type(final_target.record->type) + crypt_str("") + std::to_string(final_target.record->side) + */crypt_str(")");
+	log << crypt_str("BT: ") + std::to_string(backtrack_ticks) + crypt_str(" / ");
+	log << crypt_str("R: ") + get_resolver_type(final_target.record->type) + crypt_str("") + std::to_string(final_target.record->side) + +crypt_str(" )");
 
 	if (g_cfg.misc.events_to_log[EVENTLOG_HIT])
 		eventlogs::get().add(log.str());

@@ -355,7 +355,6 @@ class player_t : public entity_t
 public:
     NETVAR(bool, m_bClientSideAnimation, crypt_str("CBaseAnimating"), crypt_str("m_bClientSideAnimation"));
     NETVAR(bool, m_bHasDefuser, crypt_str("CCSPlayer"), crypt_str("m_bHasDefuser"));
-    NETVAR(bool, get_cycle, crypt_str("CBaseAnimating"), crypt_str("m_flCycle"));
     NETVAR(bool, m_bGunGameImmunity, crypt_str("CCSPlayer"), crypt_str("m_bGunGameImmunity"));
     NETVAR(int, m_iShotsFired, crypt_str("CCSPlayer"), crypt_str("m_iShotsFired"));
     NETVAR(Vector, m_angEyeAngles, crypt_str("CCSPlayer"), crypt_str("m_angEyeAngles[0]"));
@@ -440,7 +439,6 @@ public:
     Vector hitbox_position(int hitbox_id);
     Vector hitbox_position_matrix(int hitbox_id, matrix3x4_t matrix[MAXSTUDIOBONES]);
     AnimationLayer* get_animlayers();
-    AnimationLayer* GetAnimOverlay(int index);
     CUtlVector <matrix3x4_t>& m_CachedBoneData();
     CBoneAccessor& m_BoneAccessor();
     void invalidate_bone_cache();
@@ -451,8 +449,6 @@ public:
     bool is_alive();
     bool valid(bool check_team, bool check_dormant = true);
     int get_move_type();
-    Vector GetBonePos(int bone);
-    bool CanSeePlayer(player_t* player, const Vector& pos);
     int animlayer_count();
     int sequence_activity(int sequence);
     float get_max_desync_delta();

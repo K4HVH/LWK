@@ -28,10 +28,8 @@ bool autowall::is_breakable_entity(IClientEntity* e)
 	return result;
 }
 
-void autowall::scale_damage(player_t* e, CGameTrace& enterTrace, weapon_info_t* weaponData, float& currentDamage)
+void autowall::scale_damage(player_t* e, CGameTrace &enterTrace, weapon_info_t *weaponData, float& currentDamage)
 {
-	if (e == nullptr || !e->is_alive()) return;
-
 	if (!e->is_player())
 		return;
 
@@ -42,7 +40,7 @@ void autowall::scale_damage(player_t* e, CGameTrace& enterTrace, weapon_info_t* 
 
 		if (armor_value > 0)
 		{
-			switch (enterTrace.hitgroup)
+			switch (enterTrace.hitgroup) 
 			{
 			case HITGROUP_GENERIC:
 			case HITGROUP_CHEST:
@@ -78,7 +76,7 @@ void autowall::scale_damage(player_t* e, CGameTrace& enterTrace, weapon_info_t* 
 	if (armor_heavy)
 		head_scale *= 0.5f;
 
-	switch (enterTrace.hitgroup)
+	switch (enterTrace.hitgroup) 
 	{
 	case HITGROUP_HEAD:
 		currentDamage *= 4.0f * head_scale;
@@ -98,7 +96,7 @@ void autowall::scale_damage(player_t* e, CGameTrace& enterTrace, weapon_info_t* 
 		break;
 	}
 
-	if (is_armored())
+	if (is_armored()) 
 	{
 		auto armor_scale = 1.0f;
 		auto armor_ratio = weaponData->flArmorRatio * 0.5f;
@@ -132,19 +130,19 @@ bool autowall::trace_to_exit(CGameTrace& enterTrace, CGameTrace& exitTrace, Vect
 	auto fDistance = 0.0f;
 	Vector start, end;
 
-	do
+	do 
 	{
 		fDistance += 4.0f;
 
 		end = startPosition + direction * fDistance;
 		start = end - direction * 4.0f;
 
-		if (!enter_point_contents)
+		if (!enter_point_contents) 
 		{
 			enter_point_contents = m_trace()->GetPointContents(end, 0x4600400B);
 			point_contents = enter_point_contents;
 		}
-		else
+		else 
 			point_contents = m_trace()->GetPointContents(end, 0x4600400B);
 
 		if (point_contents & MASK_SHOT_HULL && (!(point_contents & CONTENTS_HITBOX) || enter_point_contents == point_contents))
@@ -152,17 +150,17 @@ bool autowall::trace_to_exit(CGameTrace& enterTrace, CGameTrace& exitTrace, Vect
 
 		static auto trace_filter_simple = util::FindSignature(crypt_str("client.dll"), crypt_str("55 8B EC 83 E4 F0 83 EC 7C 56 52")) + 0x3D;
 
-		uint32_t filter_[4] =
-		{
+		uint32_t filter_[4] = 
+		{ 
 			*(uint32_t*)(trace_filter_simple),
 			(uint32_t)g_ctx.local(),
-			0,
-			0
+			0, 
+			0 
 		};
 
 		util::trace_line(end, start, MASK_SHOT_HULL | CONTENTS_HITBOX, (CTraceFilter*)filter_, &exitTrace); //-V641
 
-		if (exitTrace.startsolid && exitTrace.surface.flags & SURF_HITBOX)
+		if (exitTrace.startsolid && exitTrace.surface.flags & SURF_HITBOX) 
 		{
 			CTraceFilter filter;
 			filter.pSkip = exitTrace.hit_entity;
@@ -182,7 +180,7 @@ bool autowall::trace_to_exit(CGameTrace& enterTrace, CGameTrace& exitTrace, Vect
 		{
 			if (*name == 1936744813 && name[1] == 1601397551 && name[2] == 1768318575 && name[3] == 1731159395 && name[4] == 1936941420 && name[5] == 1651668271 && name[6] == 1734307425 && name[7] == 1936941420)
 				is_window = 1;
-			else
+			else 
 			{
 				is_window = 0;
 
@@ -212,7 +210,7 @@ bool autowall::trace_to_exit(CGameTrace& enterTrace, CGameTrace& exitTrace, Vect
 	LABEL_37:
 		if (!exitTrace.DidHit() || exitTrace.startsolid)
 		{
-			if (enterTrace.hit_entity && enterTrace.hit_entity->EntIndex() && is_breakable_entity(enterTrace.hit_entity))
+			if (enterTrace.hit_entity && enterTrace.hit_entity->EntIndex() && is_breakable_entity(enterTrace.hit_entity)) 
 			{
 				exitTrace = enterTrace;
 				exitTrace.endpos = startPosition + direction;
@@ -234,7 +232,8 @@ bool autowall::trace_to_exit(CGameTrace& enterTrace, CGameTrace& exitTrace, Vect
 		if (exitTrace.plane.normal.Dot(direction) <= 1.0)
 			return true;
 
-	} while (fDistance <= 90.0f);
+	} 
+	while (fDistance <= 90.0f);
 
 	return false;
 }
@@ -257,7 +256,6 @@ bool autowall::handle_bullet_penetration(weapon_info_t* weaponData, CGameTrace& 
 	auto is_light_surf = enterTrace.surface.flags >> 7 & SURF_LIGHT;
 
 	trace_t exit_trace;
-	player_t* m_pEnt;
 
 	if (!trace_to_exit(enterTrace, exit_trace, enterTrace.endpos, direction) && !(m_trace()->GetPointContents(enterTrace.endpos, MASK_SHOT_HULL) & MASK_SHOT_HULL))
 		return false;
@@ -274,53 +272,42 @@ bool autowall::handle_bullet_penetration(weapon_info_t* weaponData, CGameTrace& 
 	auto combined_damage_modifier = 0.16f;
 	auto combined_penetration_modifier = (enter_penetration_modifier + exit_penetration_modifier) * 0.5f;
 
-	static auto dmg_reduction_bullets = m_cvar()->FindVar("ff_damage_reduction_bullets")->GetFloat();
-	static auto dmg_bullet_penetration = m_cvar()->FindVar("ff_damage_bullet_penetration")->GetFloat();
-
-	auto ent = reinterpret_cast<player_t*>(exit_trace.hit_entity);
-
-	if (enter_material == CHAR_TEX_GRATE || enter_material == CHAR_TEX_GLASS)
+	if (enter_material == CHAR_TEX_GLASS || enter_material == CHAR_TEX_GRATE)
 	{
 		combined_penetration_modifier = 3.0f;
 		combined_damage_modifier = 0.05f;
 	}
-	else if (is_light_surf || is_solid_surf)
-	{
+	else if (contents_grate || surf_nodraw)
 		combined_penetration_modifier = 1.0f;
-		combined_damage_modifier = 0.16f;
-	}
-	else if (enter_material == CHAR_TEX_FLESH && ent->m_iTeamNum() != g_ctx.local()->m_iTeamNum() && !dmg_reduction_bullets)
+	else if (enter_material == CHAR_TEX_FLESH && ((player_t*)enterTrace.hit_entity)->m_iTeamNum() == g_ctx.local()->m_iTeamNum() && !ff_damage_reduction_bullets) 
 	{
-		if (!dmg_bullet_penetration)
+		if (!ff_damage_bullet_penetration) //-V550
 			return false;
 
-		combined_penetration_modifier = dmg_bullet_penetration;
-		combined_damage_modifier = 0.16f;
-	}
-	else
-	{
-		combined_penetration_modifier = (enter_penetration_modifier + exit_penetration_modifier) * 0.5f;
+		combined_penetration_modifier = ff_damage_bullet_penetration;
 		combined_damage_modifier = 0.16f;
 	}
 
-	if (enter_material == exit_material)
+	if (enter_material == exit_material) 
 	{
-		if (exit_material == CHAR_TEX_CARDBOARD || exit_material == CHAR_TEX_WOOD)
-			combined_damage_modifier = 3.f;
+		if (exit_material == CHAR_TEX_WOOD || exit_material == CHAR_TEX_CARDBOARD)
+			combined_penetration_modifier = 3.0f;
 		else if (exit_material == CHAR_TEX_PLASTIC)
-			combined_damage_modifier = 2.0f;
+			combined_penetration_modifier = 2.0f;
 	}
 
 	auto penetration_modifier = std::fmaxf(0.0f, 1.0f / combined_penetration_modifier);
-	auto penetration_distance = (exit_trace.endpos - enterTrace.endpos).LengthSqr();
+	auto penetration_distance = (exit_trace.endpos - enterTrace.endpos).Length();
 
-	float lost_damage = fmax(((penetration_modifier * penetration_distance) / 24.f) + ((currentDamage * combined_damage_modifier) + (fmax(3.75f / enter_penetration_modifier, 0.f) * 3.f * combined_damage_modifier)), 0.f);
+	penetration_distance = penetration_distance * penetration_distance * penetration_modifier * 0.041666668f;
 
-	if (lost_damage > currentDamage)
+	auto damage_modifier = max(0.0f, 3.0f / weaponData->flPenetration * 1.25f) * penetration_modifier * 3.0f + currentDamage * combined_damage_modifier + penetration_distance;
+	auto damage_lost = max(0.0f, damage_modifier);
+
+	if (damage_lost > currentDamage)
 		return false;
 
-	if (lost_damage > 0.f)
-		currentDamage -= lost_damage;
+	currentDamage -= damage_lost;
 
 	if (currentDamage < 1.0f)
 		return false;

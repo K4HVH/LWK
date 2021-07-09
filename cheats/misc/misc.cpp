@@ -692,7 +692,7 @@ bool misc::double_tap(CUserCmd* m_pcmd)
 	
 	if (recharging_double_tap)
 	{
-		auto recharge_time = g_ctx.globals.weapon->can_double_tap() ? TIME_TO_TICKS(0.3f) : TIME_TO_TICKS(1.0f);
+		auto recharge_time = g_ctx.globals.weapon->can_double_tap() ? TIME_TO_TICKS(0.75f) : TIME_TO_TICKS(1.5f);
 
 		if (!aim::get().should_stop && fabs(g_ctx.globals.fixed_tickbase - last_double_tap) > recharge_time)
 		{

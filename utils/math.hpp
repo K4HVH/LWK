@@ -10,17 +10,15 @@
 #define DEG2RAD(x) DirectX::XMConvertToRadians(x)
 
 namespace math {
-	void normalize_angles(Vector& angles);
+	void normalize_angles(Vector & angles);
 	float angle_distance(float firstangle, float secondangle);
-	void normalize_angle(QAngle& angles);
-	void normalize_vector(Vector& vector);
+	void normalize_angle(QAngle & angles);
+	void normalize_vector(Vector & vector);
 	float normalize_yaw(float f);
 	float normalize_pitch(float pitch);
 	float vector_normalize(Vector& v);
-	bool IsNearEqual(float v1, float v2, float Tolerance);
-	void clamp_angles(Vector& angles);
-	void vector_transform(const Vector& in1, const matrix3x4_t& in2, Vector& out);
-	void vector_i_transform(const Vector& in1, const matrix3x4_t& in2, Vector& out);
+	void clamp_angles(Vector & angles);
+	void vector_transform(const Vector& in1, const matrix3x4_t & in2, Vector & out);
 	Vector calculate_angle(const Vector& src, const Vector& dst);
 	float get_fov(const Vector& viewangles, const Vector& aim_angle);
 	void angle_vectors(const Vector& angles, Vector& forward);
@@ -30,10 +28,10 @@ namespace math {
 	void VectorMAInline(const float* start, float scale, const float* direction, float* dest);
 	void VectorMAInline(const Vector& start, float scale, const Vector& direction, Vector& dest);
 	void VectorMA(const Vector& start, float scale, const Vector& direction, Vector& dest);
-	void VectorMA(const float* start, float scale, const float* direction, float* dest);
-	Vector cross_product(const Vector& a, const Vector& b);
-	float dot_product(const Vector& a, const Vector& b);
-	bool world_to_screen(const Vector& origin, Vector& screen);
+	void VectorMA(const float * start, float scale, const float *direction, float *dest);
+	Vector cross_product(const Vector & a, const Vector & b);
+	float dot_product(const Vector & a, const Vector & b);
+	bool world_to_screen(const Vector &origin, Vector &screen);
 	void SmoothAngle(Vector& From, Vector& To, float Percent);
 	void rotate_triangle(std::array<Vector2D, 3>& points, float rotation);
 	float random_float(float min, float max);
@@ -43,7 +41,6 @@ namespace math {
 	bool intersect_line_with_bb(Vector& start, Vector& end, Vector& min, Vector& max);
 	Vector vector_rotate(const Vector& in1, const matrix3x4_t& in2);
 	Vector vector_rotate(const Vector& in1, const Vector& in2);
-	void vector_i_rotate(const Vector& in1, const matrix3x4_t& in2, Vector& out);
 	matrix3x4_t angle_matrix(const Vector& angles);
 	void angle_matrix(const Vector& ang, const Vector& pos, matrix3x4_t& out);
 	void vector_rotate(const Vector& in1, const matrix3x4_t& in2, Vector& out);
@@ -57,7 +54,6 @@ namespace math {
 	float simple_spline(float value);
 	float simple_spline_remap_val_clamped(float value, float a, float b, float c, float d);
 	float direction_difference(const Vector& first, const Vector& second);
-	float angle_difference(float destAngle, float srcAngle);
 
 	template<class T, class U>
 	static T clamp(const T& in, const U& low, const U& high)

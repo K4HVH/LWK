@@ -344,25 +344,22 @@ void lagcompensation::update_player_animations(player_t* e)
 		case MAIN:
 			e->setup_bones_fixed(record->matrixes_data.main, BONE_USED_BY_ANYTHING);
 			break;
-		case FIRST:
-			e->setup_bones_fixed(record->matrixes_data.negative, BONE_USED_BY_HITBOX);
-			break;
 		case NONE:
 			e->setup_bones_fixed(record->matrixes_data.zero, BONE_USED_BY_HITBOX);
 			break;
+		case FIRST:
+			e->setup_bones_fixed(record->matrixes_data.first, BONE_USED_BY_HITBOX);
+			break;
 		case SECOND:
-			e->setup_bones_fixed(record->matrixes_data.positive, BONE_USED_BY_HITBOX);
+			e->setup_bones_fixed(record->matrixes_data.second, BONE_USED_BY_HITBOX);
 			break;
 		}
 
 		memcpy(e->get_animlayers(), backup_layers, e->animlayer_count() * sizeof(AnimationLayer));
 	};
 
-#if RELEASE
+
 	if (!player_info.fakeplayer && g_ctx.local()->is_alive() && e->m_iTeamNum() != g_ctx.local()->m_iTeamNum() && !g_cfg.legitbot.enabled) //-V807
-#else
-	if (g_ctx.local()->is_alive() && e->m_iTeamNum() != g_ctx.local()->m_iTeamNum() && !g_cfg.legitbot.enabled)
-#endif
 	{
 		animstate->m_flGoalFeetYaw = previous_goal_feet_yaw[e->EntIndex()]; //-V807
 
@@ -400,60 +397,48 @@ void lagcompensation::update_player_animations(player_t* e)
 		setup_matrix(e, animlayers, SECOND);
 		memcpy(animstate, &state, sizeof(c_baseplayeranimationstate));
 
-		bool smt;
-
 		player_resolver[e->EntIndex()].initialize(e, record, previous_goal_feet_yaw[e->EntIndex()], e->m_angEyeAngles().x);
 		player_resolver[e->EntIndex()].resolve_yaw();
-		player_resolver[e->EntIndex()].good_resik(e);
-		player_resolver[e->EntIndex()].IsLBYdesync(e);
-		player_resolver[e->EntIndex()].resolver1(e);
-		player_resolver[e->EntIndex()].resolve_logic(e);
-		player_resolver[e->EntIndex()].goal_feet_yaw_bruteforce(e, smt);
 
 		if (g_cfg.player_list.low_delta[e->EntIndex()])
 		{
 			switch (record->side)
 			{
-			case RESOLVER_ORIGINAL:
-				record->side = RESOLVER_FIRST;
-				break;
-			case RESOLVER_ZERO:
+			case RESOLVER_FIRST:
 				record->side = RESOLVER_LOW_FIRST;
 				break;
-			case RESOLVER_FIRST:
+			case RESOLVER_SECOND:
 				record->side = RESOLVER_LOW_SECOND;
 				break;
-			case RESOLVER_SECOND:
+			case RESOLVER_LOW_FIRST:
+				record->side = RESOLVER_FIRST;
+				break;
+			case RESOLVER_LOW_SECOND:
 				record->side = RESOLVER_SECOND;
 				break;
 			}
 		}
-		else
+
+		switch (record->side)
 		{
-			switch (record->side)
-			{
-			case RESOLVER_ORIGINAL:
-				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y + 58.0f);
-				break;
-			case RESOLVER_ZERO:
-				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y - 58.0f);
-				break;
-			case RESOLVER_FIRST:
-				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y - 17.0f);
-				break;
-			case RESOLVER_SECOND:
-				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y + 19.0f);
-				break;
-			case RESOLVER_THIRD:
-				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y - 40.0f);
-				break;
-			case RESOLVER_LOW_FIRST:
-				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y + 29.0f);
-				break;
-			case RESOLVER_LOW_SECOND:
-				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y - 29.0f);
-				break;
-			}
+		case RESOLVER_ORIGINAL:
+			animstate->m_flGoalFeetYaw = previous_goal_feet_yaw[e->EntIndex()];
+			break;
+		case RESOLVER_ZERO:
+			animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y);
+			break;
+		case RESOLVER_FIRST:
+			animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y + 60.0f);
+			break;
+		case RESOLVER_SECOND:
+			animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y - 60.0f);
+			break;
+		case RESOLVER_LOW_FIRST:
+			animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y + 30.0f);
+			break;
+		case RESOLVER_LOW_SECOND:
+			animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y - 30.0f);
+			break;
 		}
 
 		e->m_angEyeAngles().x = player_resolver[e->EntIndex()].resolve_pitch();

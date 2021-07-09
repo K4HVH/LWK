@@ -105,13 +105,13 @@ void zeusbot::scan(adjust_data* record, scan_data& data)
 		{
 			auto safe = 0.0f;
 
-			if (record->matrixes_data.zero[0].GetOrigin() == record->matrixes_data.negative[0].GetOrigin() || record->matrixes_data.zero[0].GetOrigin() == record->matrixes_data.positive[0].GetOrigin() || record->matrixes_data.negative[0].GetOrigin() == record->matrixes_data.positive[0].GetOrigin())
+			if (record->matrixes_data.zero[0].GetOrigin() == record->matrixes_data.first[0].GetOrigin() || record->matrixes_data.zero[0].GetOrigin() == record->matrixes_data.second[0].GetOrigin() || record->matrixes_data.first[0].GetOrigin() == record->matrixes_data.second[0].GetOrigin())
 				safe = 0.0f;
 			else if (!hitbox_intersection(record->player, record->matrixes_data.zero, hitbox, g_ctx.globals.eye_pos, point.point, &safe))
 				safe = 0.0f;
-			else if (!hitbox_intersection(record->player, record->matrixes_data.negative, hitbox, g_ctx.globals.eye_pos, point.point, &safe))
+			else if (!hitbox_intersection(record->player, record->matrixes_data.first, hitbox, g_ctx.globals.eye_pos, point.point, &safe))
 				safe = 0.0f;
-			else if (!hitbox_intersection(record->player, record->matrixes_data.positive, hitbox, g_ctx.globals.eye_pos, point.point, &safe))
+			else if (!hitbox_intersection(record->player, record->matrixes_data.second, hitbox, g_ctx.globals.eye_pos, point.point, &safe))
 				safe = 0.0f;
 
 			point.safe = safe;

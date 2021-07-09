@@ -33,24 +33,6 @@
 #include <d3dx9.h>
 #include <d3d9.h>
 
-template <typename T, typename ... args_t>
-constexpr T CallVFunc(void* thisptr, std::size_t nIndex, args_t... argList)
-{
-	using VirtualFnn = T(__thiscall*)(void*, decltype(argList)...);
-	return (*static_cast<VirtualFnn**>(thisptr))[nIndex](thisptr, argList...);
-}
-
-class weapon_info_t;
-
-class IWeaponSystem
-{
-public:
-	weapon_info_t* GetWeaponData(short nItemDefinitionIndex)
-	{
-		return CallVFunc<weapon_info_t*>(this, 2, nItemDefinitionIndex);
-	}
-};
-
 class InterfaceReg
 {
 private:
@@ -100,7 +82,6 @@ public:
 	IEngineTool* m_enginetool();
 	DWORD m_postprocessing();
 	DWORD m_ccsplayerrenderablevftable();
-	IWeaponSystem* m_WeaponSystem();
 private:
 	IDirect3DDevice9 * p_device = nullptr;
 	IVEngineClient * p_engine = nullptr;
@@ -136,7 +117,6 @@ private:
 	ILocalize * p_localize = nullptr;
 	IBaseFileSystem* p_basefilesys = nullptr;
 	IEngineTool* p_enginetool = nullptr;
-	IWeaponSystem* p_WeaponSystem = nullptr;
 	DWORD p_postprocessing = 0;
 	DWORD p_ccsplayerrenderablevftable = 0;
 };

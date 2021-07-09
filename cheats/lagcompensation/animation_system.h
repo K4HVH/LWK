@@ -14,13 +14,10 @@ enum
 enum resolver_type
 {
 	ORIGINAL,
-	ZARO,
-	FIRST2,
-	SECOND2,
-	THIRD,
-	LOW_FIRST,
-	LOW_SECOND
-
+	BRUTEFORCE,
+	LBY,
+	TRACE,
+	DIRECTIONAL
 };
 
 enum resolver_side
@@ -29,7 +26,6 @@ enum resolver_side
 	RESOLVER_ZERO,
 	RESOLVER_FIRST,
 	RESOLVER_SECOND,
-	RESOLVER_THIRD,
 	RESOLVER_LOW_FIRST,
 	RESOLVER_LOW_SECOND
 };
@@ -38,8 +34,8 @@ struct matrixes
 {
 	matrix3x4_t main[MAXSTUDIOBONES];
 	matrix3x4_t zero[MAXSTUDIOBONES];
-	matrix3x4_t positive[MAXSTUDIOBONES];
-	matrix3x4_t negative[MAXSTUDIOBONES];
+	matrix3x4_t first[MAXSTUDIOBONES];
+	matrix3x4_t second[MAXSTUDIOBONES];
 };
 
 class adjust_data;
@@ -54,30 +50,16 @@ class resolver
 	bool was_first_bruteforce = false;
 	bool was_second_bruteforce = false;
 
-	bool m_flBrute = false;
-
-	bool IsLbyDesync = false;
-
 	float lock_side = 0.0f;
 	float original_goal_feet_yaw = 0.0f;
 	float original_pitch = 0.0f;
-	float BrutSide = 0.0f;
-
-	int RightSide;
-	int LeftSide;
 public:
 	void initialize(player_t* e, adjust_data* record, const float& goal_feet_yaw, const float& pitch);
 	void reset();
 	void resolve_yaw();
 	float resolve_pitch();
-	void good_resik(player_t* player);
-	int GetChokedPackets(player_t* entity);
-	bool IsLBYdesync(player_t* record);
-	void resolver1(player_t* player);
-	void resolve_logic(player_t* player);
-	void goal_feet_yaw_bruteforce(player_t* player, bool smt);
 
-	resolver_side last_side = RESOLVER_LOW_SECOND;
+	resolver_side last_side = RESOLVER_ORIGINAL;
 };
 
 class adjust_data //-V730
@@ -96,8 +78,6 @@ public:
 	bool immune;
 	bool dormant;
 	bool bot;
-
-	bool shot;
 
 	int flags;
 	int bone_count;
@@ -159,7 +139,7 @@ public:
 	{
 		if (!e->is_alive())
 			return;
-
+	
 		player = e;
 		i = player->EntIndex();
 
@@ -172,14 +152,11 @@ public:
 		immune = player->m_bGunGameImmunity() || player->m_fFlags() & FL_FROZEN;
 		dormant = player->IsDormant();
 
-#if RELEASE
 		player_info_t player_info;
 		m_engine()->GetPlayerInfo(i, &player_info);
 
 		bot = player_info.fakeplayer;
-#else
-		bot = false;
-#endif
+
 
 		flags = player->m_fFlags();
 		bone_count = player->m_CachedBoneData().Count();
@@ -257,7 +234,7 @@ public:
 		auto incoming = net_channel_info->GetLatency(FLOW_INCOMING);
 
 		auto correct = math::clamp(outgoing + incoming + util::get_interpolation(), 0.0f, sv_maxunlag->GetFloat());
-
+		
 		auto curtime = g_ctx.local()->is_alive() ? TICKS_TO_TIME(g_ctx.globals.fixed_tickbase) : m_globals()->m_curtime; //-V807
 		auto delta_time = correct - (curtime - simulation_time);
 
@@ -287,9 +264,6 @@ public:
 
 	float simulation_time;
 	float duck_amount;
-	float speed;
-
-	bool shot;
 
 	Vector angles;
 	Vector origin;
