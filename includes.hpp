@@ -86,5 +86,6 @@
 #define m_soundservices g_csgo.m_soundservices
 #define m_basefilesys g_csgo.m_basefilesys
 #define m_Enginetool g_csgo.m_enginetool
+#define m_weaponsystem g_csgo.m_WeaponSystem
 
 #include "steam_sdk/steam_api.h"

@@ -445,7 +445,7 @@ void lagcompensation::update_player_animations(player_t* e)
 				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y + 19.0f);
 				break;
 			case RESOLVER_THIRD:
-				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y - 40.0f);
+				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y - 19.0f);
 				break;
 			case RESOLVER_LOW_FIRST:
 				animstate->m_flGoalFeetYaw = math::normalize_yaw(e->m_angEyeAngles().y + 29.0f);

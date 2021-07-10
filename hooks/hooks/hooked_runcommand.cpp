@@ -11,7 +11,7 @@ using RunCommand_t = void(__thiscall*)(void*, player_t*, CUserCmd*, IMoveHelper*
 
 void __fastcall hooks::hooked_runcommand(void* ecx, void* edx, player_t* player, CUserCmd* m_pcmd, IMoveHelper* move_helper)
 {
-	static auto original_fn = prediction_hook->get_func_address <RunCommand_t> (19);
+	static auto original_fn = prediction_hook->get_func_address <RunCommand_t>(19);
 	g_ctx.local((player_t*)m_entitylist()->GetClientEntity(m_engine()->GetLocalPlayer()), true);
 
 	if (!player || player != g_ctx.local())
@@ -45,7 +45,7 @@ void __fastcall hooks::hooked_runcommand(void* ecx, void* edx, player_t* player,
 			in_attack[m_pcmd->m_command_number % MULTIPLAYER_BACKUP] = m_pcmd->m_buttons & IN_ATTACK || m_pcmd->m_buttons & IN_ATTACK2;
 			can_shoot[m_pcmd->m_command_number % MULTIPLAYER_BACKUP] = weapon->can_fire(false);
 
-			if (weapon->m_iItemDefinitionIndex() == WEAPON_REVOLVER) 
+			if (weapon->m_iItemDefinitionIndex() == WEAPON_REVOLVER)
 			{
 				auto postpone_fire_ready_time = FLT_MAX;
 				auto tickrate = (int)(1.0f / m_globals()->m_intervalpertick);
@@ -54,7 +54,7 @@ void __fastcall hooks::hooked_runcommand(void* ecx, void* edx, player_t* player,
 				{
 					auto command_number = m_pcmd->m_command_number - 1;
 					auto shoot_number = 0;
-			
+
 					for (auto i = 1; i < tickrate >> 1; ++i)
 					{
 						shoot_number = command_number;
@@ -94,92 +94,145 @@ using InPrediction_t = bool(__thiscall*)(void*);
 
 bool __stdcall hooks::hooked_inprediction()
 {
-	static auto original_fn = prediction_hook->get_func_address <InPrediction_t> (14);
-	static auto maintain_sequence_transitions = util::FindSignature(crypt_str("client.dll"), crypt_str("84 C0 74 17 8B 87"));
+	static auto original_fn = prediction_hook->get_func_address <InPrediction_t>(14);
+	static auto maintain_sequence_transitions = (void*)util::FindSignature(crypt_str("client.dll"), crypt_str("84 C0 74 17 8B 87"));
+	static auto setupbones_timing = (void*)util::FindSignature(crypt_str("client.dll"), crypt_str("84 C0 74 0A F3 0F 10 05 ? ? ? ? EB 05"));
+	static void* calcplayerview_return = (void*)util::FindSignature(crypt_str("client.dll"), crypt_str("84 C0 75 0B 8B 0D ? ? ? ? 8B 01 FF 50 4C"));
 
-	if ((g_cfg.ragebot.enable || g_cfg.legitbot.enabled) && g_ctx.globals.setuping_bones && (uintptr_t)_ReturnAddress() == maintain_sequence_transitions)
+	if (maintain_sequence_transitions && g_ctx.globals.setuping_bones && _ReturnAddress() == maintain_sequence_transitions)
 		return true;
 
+	if (setupbones_timing && _ReturnAddress() == setupbones_timing)
+		return false;
+
+	if (m_engine()->IsInGame()) {
+		if (_ReturnAddress() == calcplayerview_return)
+			return true;
+	}
+
 	return original_fn(m_prediction());
+}
+
+typedef void(__vectorcall* cl_move_t)(float, bool);
+
+void __vectorcall hooks::hooked_clmove(float accumulated_extra_samples, bool bFinalTick)
+{
+	if (g_ctx.local()) {
+		g_ctx.globals.current_tickcount = m_globals()->m_tickcount;
+		if (m_clientstate() && m_clientstate()->pNetChannel)
+			g_ctx.globals.out_sequence_nr = m_clientstate()->pNetChannel->m_nOutSequenceNr;
+		else
+			g_ctx.globals.out_sequence_nr = 0;
+
+	}
+
+	(cl_move_t(hooks::original_clmove))(accumulated_extra_samples, bFinalTick);
+
+	if (g_cfg.ragebot.enable)
+	{
+		if (!g_ctx.local()
+			|| !g_ctx.local()->is_alive()
+			|| g_ctx.local()->m_fFlags() & 0x40) // fl frozen. Aka engine paused.
+			return;
+		else if (m_clientstate()) {
+			INetChannel* net_channel = m_clientstate()->pNetChannel;
+			if (net_channel && !(m_clientstate()->iChokedCommands % 4)) {
+				const auto current_choke = net_channel->m_nChokedPackets;
+				const auto out_sequence_nr = net_channel->m_nOutSequenceNr;
+
+				net_channel->m_nChokedPackets = 0;
+				net_channel->m_nOutSequenceNr = g_ctx.globals.out_sequence_nr;
+
+				net_channel->send_datagram();
+
+				net_channel->m_nOutSequenceNr = out_sequence_nr;
+				net_channel->m_nChokedPackets = current_choke;
+			}
+		}
+	}
 }
 
 using WriteUsercmdDeltaToBuffer_t = bool(__thiscall*)(void*, int, void*, int, int, bool);
 void WriteUser—md(void* buf, CUserCmd* incmd, CUserCmd* outcmd);
 
-bool __fastcall hooks::hooked_writeusercmddeltatobuffer(void* ecx, void* edx, int slot, bf_write* buf, int from, int to, bool is_new_command)
+bool __fastcall hooks::hooked_writeusercmddeltatobuffer(void* ecx_, void* edx_, int nslot, bf_write* buf, int from, int to, bool isnewcmd)
 {
-	static auto original_fn = client_hook->get_func_address <WriteUsercmdDeltaToBuffer_t> (24);
+	static auto sendmovecall = (void*)util::FindSignature(crypt_str("engine.dll"), crypt_str("84 C0 74 04 B0 01 EB 02 32 C0 8B FE 46 3B F3 7E C9 84 C0 0F 84"));
+	static auto original_fn = client_hook->get_func_address <WriteUsercmdDeltaToBuffer_t>(24);
 
 	if (!g_ctx.globals.tickbase_shift)
-		return original_fn(ecx, slot, buf, from, to, is_new_command);
+		return original_fn(ecx_, nslot, buf, from, to, isnewcmd);
+
+	uintptr_t stackbase;
+	__asm mov stackbase, ebp;
+
+	auto m_pnNewCmds = reinterpret_cast <int*> (stackbase + 0xFCC);
+
+	int m_nNewCmds = *m_pnNewCmds;
+
+	int m_nTickbase = g_ctx.globals.tickbase_shift;
+
+	int m_nTotalNewCmds = min(m_nNewCmds + abs(m_nTickbase), 62);
 
 	if (from != -1)
 		return true;
 
-	auto final_from = -1;
+	int m_nNewCommands = m_nTotalNewCmds;
+	int m_nBackupCommands = 0;
+	int m_nNextCmd = m_clientstate()->nLastOutgoingCommand + m_clientstate()->iChokedCommands + 1;
 
-	uintptr_t frame_ptr;
-	__asm mov frame_ptr, ebp;
-
-	auto backup_commands = reinterpret_cast <int*> (frame_ptr + 0xFD8);
-	auto new_commands = reinterpret_cast <int*> (frame_ptr + 0xFDC);
-
-	auto newcmds = *new_commands;
-	auto shift = g_ctx.globals.tickbase_shift;
-
-	g_ctx.globals.tickbase_shift = 0;
-	*backup_commands = 0;
-
-	auto choked_modifier = newcmds + shift;
-
-	if (choked_modifier > 62)
-		choked_modifier = 62;
-
-	*new_commands = choked_modifier;
-
-	auto next_cmdnr = m_clientstate()->iChokedCommands + m_clientstate()->nLastOutgoingCommand + 1;
-	auto final_to = next_cmdnr - newcmds + 1;
-
-	if (final_to <= next_cmdnr)
+	if (to > m_nNextCmd)
 	{
-		while (original_fn(ecx, slot, buf, final_from, final_to, true))
+	Run:
+		CUserCmd* m_pCmd = m_input()->GetUserCmd(from);
+		if (m_pCmd)
 		{
-			final_from = final_to++;
+			CUserCmd m_nToCmd = *m_pCmd, m_nFromCmd = *m_pCmd;
+			m_nToCmd.m_command_number++;
+			m_nToCmd.m_tickcount += m_globals()->m_tickcount + 2 * m_globals()->m_tickcount;
+			for (int i = m_nNewCmds; i <= m_nTotalNewCmds; i++)
+			{
+				int m_shift = m_nTotalNewCmds - m_nNewCmds + 1;
 
-			if (final_to > next_cmdnr)
-				goto next_cmd;
+				do
+				{
+					//       WriteUserCmd(buf, &m_nToCmd, &m_nFromCmd);
+					m_nFromCmd.m_buttons = m_nToCmd.m_buttons;
+					m_nFromCmd.m_viewangles.x = m_nToCmd.m_viewangles.x;
+					m_nFromCmd.m_impulse = m_nToCmd.m_impulse;
+					m_nFromCmd.m_weaponselect = m_nToCmd.m_weaponselect;
+					m_nFromCmd.m_aimdirection.y = m_nToCmd.m_aimdirection.y;
+					m_nFromCmd.m_weaponsubtype = m_nToCmd.m_weaponsubtype;
+					m_nFromCmd.m_upmove = m_nToCmd.m_upmove;
+					m_nFromCmd.m_random_seed = m_nToCmd.m_random_seed;
+					m_nFromCmd.m_mousedx = m_nToCmd.m_mousedx;
+					m_nFromCmd.pad_0x4C[3] = m_nToCmd.pad_0x4C[3];
+					m_nFromCmd.m_command_number = m_nToCmd.m_command_number;
+					m_nFromCmd.m_tickcount = m_nToCmd.m_tickcount;
+					m_nFromCmd.m_mousedy = m_nToCmd.m_mousedy;
+					m_nFromCmd.pad_0x4C[19] = m_nToCmd.pad_0x4C[19];
+					m_nFromCmd.m_predicted = m_nToCmd.m_predicted;
+					m_nFromCmd.pad_0x4C[23] = m_nToCmd.pad_0x4C[23];
+					m_nToCmd.m_command_number++;
+					m_nToCmd.m_tickcount++;
+					--m_shift;
+				} while (m_shift);
+			}
+			return true;
 		}
+	}
+	else
+	{
+		while (original_fn(ecx_, nslot, buf, from, to, true))
+		{
+			from = to++;
 
+			if (to > m_nNextCmd)
+				goto Run;
+
+		}
 		return false;
 	}
-next_cmd:
-
-	auto user_cmd = m_input()->GetUserCmd(final_from);
-
-	if (!user_cmd)
-		return true;
-
-	CUserCmd to_cmd;
-	CUserCmd from_cmd;
-
-	from_cmd = *user_cmd;
-	to_cmd = from_cmd;
-
-	to_cmd.m_command_number++;
-	to_cmd.m_tickcount += 200;
-
-	if (newcmds > choked_modifier)
-		return true;
-
-	for (auto i = choked_modifier - newcmds + 1; i > 0; --i)
-	{
-		WriteUser—md(buf, &to_cmd, &from_cmd);
-
-		from_cmd = to_cmd;
-		to_cmd.m_command_number++;
-		to_cmd.m_tickcount++;
-	}
-
 	return true;
 }
 

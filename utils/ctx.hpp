@@ -64,7 +64,7 @@ class ctx_t  //-V730
 	CUserCmd* m_pcmd = nullptr;
 public:
 	struct Globals  //-V730
-	{			
+	{
 		bool loaded_script = false;
 		bool focused_on_input = false;
 		bool double_tap_fire = false;
@@ -124,8 +124,11 @@ public:
 		float original_forwardmove = 0.0f;
 		float original_sidemove = 0.0f;
 
+		int current_tickcount = 0;
+		int out_sequence_nr = 0;
+
 		std::string time = crypt_str("unknown");
-		
+
 		Vector eye_pos = ZERO;
 		Vector start_position = ZERO;
 		Vector dormant_origin[65];
@@ -160,8 +163,8 @@ public:
 
 	bool send_packet = false;
 
-	void set_command(CUserCmd* cmd) 
-	{ 
+	void set_command(CUserCmd* cmd)
+	{
 		m_pcmd = cmd;
 	}
 

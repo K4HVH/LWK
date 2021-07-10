@@ -100,7 +100,7 @@ namespace hooks
 
 	long __stdcall Hooked_EndScene(IDirect3DDevice9* pDevice)
 	{
-		static auto original_fn = directx_hook->get_func_address <EndSceneFn> (42);
+		static auto original_fn = directx_hook->get_func_address <EndSceneFn>(42);
 		return original_fn(pDevice);
 	}
 
@@ -154,7 +154,7 @@ namespace hooks
 
 	long __stdcall hooked_present(IDirect3DDevice9* device, RECT* src_rect, RECT* dest_rect, HWND dest_wnd_override, RGNDATA* dirty_region)
 	{
-		static auto original = directx_hook->get_func_address <PresentFn> (17);
+		static auto original = directx_hook->get_func_address <PresentFn>(17);
 		g_ctx.local((player_t*)m_entitylist()->GetClientEntity(m_engine()->GetLocalPlayer()), true);
 
 		if (!d3d_init)
@@ -221,6 +221,7 @@ namespace hooks
 	DWORD original_modifyeyeposition;
 	DWORD original_calcviewmodelbob;
 	DWORD original_processinterpolatedlist;
+	DWORD original_clmove;
 
 	vmthook* directx_hook;
 	vmthook* client_hook;
@@ -244,7 +245,7 @@ namespace hooks
 
 void __fastcall hooks::hooked_setkeycodestate(void* thisptr, void* edx, ButtonCode_t code, bool bDown)
 {
-	static auto original_fn = inputinternal_hook->get_func_address <SetKeyCodeState_t> (91);
+	static auto original_fn = inputinternal_hook->get_func_address <SetKeyCodeState_t>(91);
 
 	if (input_shouldListen && bDown)
 	{
@@ -259,7 +260,7 @@ void __fastcall hooks::hooked_setkeycodestate(void* thisptr, void* edx, ButtonCo
 
 void __fastcall hooks::hooked_setmousecodestate(void* thisptr, void* edx, ButtonCode_t code, MouseCodeState_t state)
 {
-	static auto original_fn = inputinternal_hook->get_func_address <SetMouseCodeState_t> (92);
+	static auto original_fn = inputinternal_hook->get_func_address <SetMouseCodeState_t>(92);
 
 	if (input_shouldListen && state == BUTTON_PRESSED)
 	{

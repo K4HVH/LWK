@@ -169,10 +169,10 @@ void C_HookedEvents::FireGameEvent(IGameEvent* event)
 					memcpy(aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Base(), aim::get().last_target[current_shot->last_target].record.matrixes_data.zero, aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Count() * sizeof(matrix3x4_t)); //-V807
 					m_trace()->ClipRayToEntity(ray, MASK_SHOT_HULL | CONTENTS_HITBOX, aim::get().last_target[current_shot->last_target].record.player, &trace_zero);
 
-					memcpy(aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Base(), aim::get().last_target[current_shot->last_target].record.matrixes_data.first, aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Count() * sizeof(matrix3x4_t)); //-V807
+					memcpy(aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Base(), aim::get().last_target[current_shot->last_target].record.matrixes_data.negative, aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Count() * sizeof(matrix3x4_t)); //-V807
 					m_trace()->ClipRayToEntity(ray, MASK_SHOT_HULL | CONTENTS_HITBOX, aim::get().last_target[current_shot->last_target].record.player, &trace_first);
 
-					memcpy(aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Base(), aim::get().last_target[current_shot->last_target].record.matrixes_data.second, aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Count() * sizeof(matrix3x4_t)); //-V807
+					memcpy(aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Base(), aim::get().last_target[current_shot->last_target].record.matrixes_data.positive, aim::get().last_target[current_shot->last_target].record.player->m_CachedBoneData().Count() * sizeof(matrix3x4_t)); //-V807
 					m_trace()->ClipRayToEntity(ray, MASK_SHOT_HULL | CONTENTS_HITBOX, aim::get().last_target[current_shot->last_target].record.player, &trace_second);
 				}
 

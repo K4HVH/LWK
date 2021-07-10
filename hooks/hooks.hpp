@@ -19,7 +19,7 @@
 class C_HookedEvents : public IGameEventListener2
 {
 public:
-	void FireGameEvent(IGameEvent * event);
+	void FireGameEvent(IGameEvent* event);
 	void RegisterSelf();
 	void RemoveSelf();
 	int GetEventDebugID(void);
@@ -62,7 +62,7 @@ namespace hooks
 
 	extern C_HookedEvents hooked_events;
 
-	using GetForeignFallbackFontNameFn = const char*(__thiscall*)(void*);
+	using GetForeignFallbackFontNameFn = const char* (__thiscall*)(void*);
 	using SetupBonesFn = bool(__thiscall*)(void*, matrix3x4_t*, int, int, float);
 	using DoExtraBonesProcessingFn = void(__thiscall*)(player_t*, CStudioHdr*, Vector*, Quaternion*, const matrix3x4_t&, uint8_t*, void*);
 	using StandardBlendingRulesFn = void(__thiscall*)(player_t*, CStudioHdr*, Vector*, Quaternion*, float, int);
@@ -81,16 +81,17 @@ namespace hooks
 	extern DWORD original_modifyeyeposition;
 	extern DWORD original_calcviewmodelbob;
 	extern DWORD original_processinterpolatedlist;
+	extern DWORD original_clmove;
 
 	void __stdcall hooked_fsn(ClientFrameStage_t);
 	bool __stdcall hooked_createmove(float, CUserCmd*);
 	bool __fastcall hooked_drawfog(void* ecx, void* edx);
-	void __stdcall hooked_overrideview(CViewSetup * setup);
+	void __stdcall hooked_overrideview(CViewSetup* setup);
 	bool __fastcall hooked_isconnected(void* ecx, void* edx);
 	float __fastcall hooked_getscreenaspectratio(void* ecx, void* edx, int width, int height);
 	bool __fastcall hooked_ishltv(void* ecx, void* edx);
-	void __stdcall hooked_dme(IMatRenderContext * ctx, const DrawModelState_t & state, const ModelRenderInfo_t & info, matrix3x4_t * bone_to_world);
-	void  __fastcall hooked_postscreeneffects(void * thisptr, void * edx, CViewSetup * setup);
+	void __stdcall hooked_dme(IMatRenderContext* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* bone_to_world);
+	void  __fastcall hooked_postscreeneffects(void* thisptr, void* edx, CViewSetup* setup);
 	void __fastcall hooked_setkeycodestate(void* thisptr, void* edx, ButtonCode_t code, bool bDown);
 	void __fastcall hooked_setmousecodestate(void* thisptr, void* edx, ButtonCode_t code, MouseCodeState_t state);
 	void __fastcall hooked_sceneend(void* ecx, void* edx);
@@ -122,6 +123,7 @@ namespace hooks
 	int __fastcall hooked_listleavesinbox(void* ecx, void* edx, Vector& mins, Vector& maxs, unsigned short* list, int list_max);
 	void __fastcall hooked_runcommand(void* ecx, void* edx, player_t* player, CUserCmd* m_pcmd, IMoveHelper* move_helper);
 	bool __stdcall hooked_inprediction();
+	void __vectorcall hooked_clmove(float accumulated_extra_samples, bool bFinalTick);
 	bool __fastcall hooked_writeusercmddeltatobuffer(void* ecx, void* edx, int slot, bf_write* buf, int from, int to, bool is_new_command);
 	void __fastcall hooked_clip_ray_collideable(void* ecx, void* edx, const Ray_t& ray, uint32_t fMask, ICollideable* pCollide, CGameTrace* pTrace);
 	void __fastcall hooked_trace_ray(void* ecx, void* edx, const Ray_t& ray, unsigned int fMask, ITraceFilter* pTraceFilter, trace_t* pTrace);
@@ -133,8 +135,8 @@ namespace hooks
 	long __stdcall hooked_present(IDirect3DDevice9* device, RECT* src_rect, RECT* dest_rect, HWND dest_wnd_override, RGNDATA* dirty_region);
 	void GUI_Init(IDirect3DDevice9* pDevice);
 
-	typedef long(__stdcall *EndSceneFn)(IDirect3DDevice9* device);
-	typedef long(__stdcall *EndSceneResetFn)(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
+	typedef long(__stdcall* EndSceneFn)(IDirect3DDevice9* device);
+	typedef long(__stdcall* EndSceneResetFn)(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
 	typedef long(__stdcall* PresentFn)(IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
 
 	typedef void(__thiscall* SetKeyCodeState_t) (void*, ButtonCode_t, bool);

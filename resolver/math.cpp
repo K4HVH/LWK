@@ -65,7 +65,7 @@ namespace math
 		}
 	}
 
-	void normalize_vector(Vector& vector) {
+	void normalize_vector(Vector & vector) {
 		for (int i = 0; i < 3; i++) {
 			while (vector[i] < -180.0f) vector[i] += 360.0f;
 			while (vector[i] > 180.0f) vector[i] -= 360.0f;
@@ -109,7 +109,7 @@ namespace math
 			v /= l;
 		else
 		{
-			v.x = v.y = 0.0f;
+			v.x = v.y = 0.0f; 
 			v.z = 1.0f;
 		}
 
@@ -131,7 +131,7 @@ namespace math
 		angles.z = 0;
 	}
 	//--------------------------------------------------------------------------------
-	void vector_transform(const Vector& in1, const matrix3x4_t& in2, Vector& out)
+	void vector_transform(const Vector& in1, const matrix3x4_t& in2, Vector& out) 
 	{
 		out = Vector(in1.Dot(Vector(in2[0][0], in2[0][1], in2[0][2])) + in2[0][3], in1.Dot(Vector(in2[1][0], in2[1][1], in2[1][2])) + in2[1][3], in1.Dot(Vector(in2[2][0], in2[2][1], in2[2][2])) + in2[2][3]);
 	}
@@ -264,7 +264,7 @@ namespace math
 			auto upZ = (left.y * forward.x) - (left.x * forward.y);
 			angles.z = atan2(left.z, upZ) * 180.0f / M_PI;
 		}
-		else
+		else 
 		{
 			angles.x = atan2(-forward.z, forwardDist) * 180.0f / M_PI;
 			angles.y = atan2(-left.x, left.y) * 180.0f / M_PI;
@@ -281,9 +281,9 @@ namespace math
 
 	void VectorMAInline(const Vector& start, float scale, const Vector& direction, Vector& dest)
 	{
-		dest.x = start.x + direction.x * scale;
-		dest.y = start.y + direction.y * scale;
-		dest.z = start.z + direction.z * scale;
+		dest.x = start.x + direction.x*scale;
+		dest.y = start.y + direction.y*scale;
+		dest.z = start.z + direction.z*scale;
 	}
 
 	void VectorMA(const Vector& start, float scale, const Vector& direction, Vector& dest)
@@ -291,24 +291,24 @@ namespace math
 		VectorMAInline(start, scale, direction, dest);
 	}
 
-	void VectorMA(const float* start, float scale, const float* direction, float* dest)
+	void VectorMA(const float * start, float scale, const float *direction, float *dest)
 	{
 		VectorMAInline(start, scale, direction, dest);
 	}
 	//--------------------------------------------------------------------------------
-	Vector cross_product(const Vector& a, const Vector& b)
+	Vector cross_product(const Vector & a, const Vector & b) 
 	{
 		return Vector(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 	}
 	//--------------------------------------------------------------------------------
-	float dot_product(const Vector& a, const Vector& b)
+	float dot_product(const Vector & a, const Vector & b)
 	{
 		return (a.x * b.x
 			+ a.y * b.y
 			+ a.z * b.z);
 	}
 	//--------------------------------------------------------------------------------
-	bool world_to_screen(const Vector& origin, Vector& screen)
+	bool world_to_screen(const Vector &origin, Vector &screen)
 	{
 		return !m_debugoverlay()->ScreenPosition(origin, screen);
 	}
@@ -386,12 +386,12 @@ namespace math
 			tn = e;
 			td = c;
 		}
-		else
+		else 
 		{
 			sn = b * e - c * d;
 			tn = a * e - b * d;
 
-			if (sn < 0.0f)
+			if (sn < 0.0f) 
 			{
 				sn = 0.0f;
 				tn = e;
@@ -405,7 +405,7 @@ namespace math
 			}
 		}
 
-		if (tn < 0.0f)
+		if (tn < 0.0f) 
 		{
 			tn = 0.0f;
 
@@ -413,13 +413,13 @@ namespace math
 				sn = 0.0f;
 			else if (-d > a)
 				sn = sd;
-			else
+			else 
 			{
 				sn = -d;
 				sd = a;
 			}
 		}
-		else if (tn > td)
+		else if (tn > td) 
 		{
 			tn = td;
 
@@ -427,7 +427,7 @@ namespace math
 				sn = 0.0f;
 			else if (-d + b > a)
 				sn = sd;
-			else
+			else 
 			{
 				sn = -d + b;
 				sd = a;
@@ -540,7 +540,7 @@ namespace math
 		return result;
 	}
 	//
-	void angle_matrix(const Vector& ang, const Vector& pos, matrix3x4_t& out)
+	void angle_matrix(const Vector& ang, const Vector& pos, matrix3x4_t& out) 
 	{
 		out = angle_matrix(ang);
 		out.SetOrigin(pos);
@@ -560,7 +560,7 @@ namespace math
 	//--------------------------------------------------------------------------------
 	void matrix_set_origin(const Vector& pos, matrix3x4_t& matrix)
 	{
-		for (auto i = 0; i < 3; i++)
+		for (auto i = 0; i < 3; i++) 
 			matrix[i][3] = pos[i];
 	}
 	//--------------------------------------------------------------------------------
@@ -587,14 +587,14 @@ namespace math
 		return sqrlen * invlen;
 	}
 	//--------------------------------------------------------------------------------
-	void math::matrix_copy(const matrix3x4_t& in, matrix3x4_t& out)
+	void math::matrix_copy(const matrix3x4_t& in, matrix3x4_t& out) 
 	{
 		memcpy(out.Base(), in.Base(), sizeof(matrix3x4_t));
 	}
 	//--------------------------------------------------------------------------------
-	void math::concat_transforms(const matrix3x4_t& in1, const matrix3x4_t& in2, matrix3x4_t& out)
+	void math::concat_transforms(const matrix3x4_t& in1, const matrix3x4_t& in2, matrix3x4_t& out) 
 	{
-		if (&in1 == &out)
+		if (&in1 == &out) 
 		{
 			matrix3x4_t in1b;
 			matrix_copy(in1, in1b);
@@ -602,7 +602,7 @@ namespace math
 			return;
 		}
 
-		if (&in2 == &out)
+		if (&in2 == &out) 
 		{
 			matrix3x4_t in2b;
 			matrix_copy(in2, in2b);

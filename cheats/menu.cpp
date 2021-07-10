@@ -1488,7 +1488,7 @@ void c_menu::draw_ragebot(int child)
 				{
 					ImGui::SameLine();
 					draw_keybind(crypt_str(""), &g_cfg.ragebot.double_tap_key, crypt_str("##HOTKEY_DT"));
-					ImGui::Checkbox(crypt_str("Slow teleport"), &g_cfg.ragebot.slow_teleport);
+					ImGui::Checkbox(crypt_str("Disable teleport"), &g_cfg.ragebot.slow_teleport);
 				}
 
 				ImGui::Checkbox(crypt_str("Hide shots"), &g_cfg.antiaim.hide_shots);
@@ -1795,7 +1795,7 @@ void c_menu::draw_visuals(int child)
 			{
 				ImGui::Checkbox(crypt_str("Enable"), &g_cfg.player.enable);
 
-				//draw_multicombo(crypt_str("Indicators"), g_cfg.esp.indicators, indicators, ARRAYSIZE(indicators), preview);
+				draw_multicombo(crypt_str("Indicators"), g_cfg.esp.indicators, indicators, ARRAYSIZE(indicators), preview);
 				//padding(0, 3);
 				//ImGui::Checkbox(crypt_str("Indicators"), &g_cfg.misc.indicators);
 				draw_multicombo(crypt_str("Removals"), g_cfg.esp.removals, removals, ARRAYSIZE(removals), preview);
