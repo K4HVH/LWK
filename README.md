@@ -4,9 +4,26 @@
 
 Discord: https://discord.gg/uAsanYpP9G
 
-DLL: https://anonfiles.com/v1Teu636u1/LWK_dll
+DLL: https://anonfiles.com/f4sau857u1/LWK_dll \
+CFG: https://anonfiles.com/hfseua53ue/hvh_ob
 
 ![alt text](https://i.imgur.com/JK0lL5R.gif)
+
+Update V1.3 (09/07/2021)\
+-Slight changes to menu\
+-Slight changes to player esp\
+-Autowall changes\
+-Animation system overhaul\
+-Local animations overhaul\
+-Resolver overhaul\
+-Setup bones changes\
+-Fakelag Changes\
+-Added "Disable Teleport" (For DT)\
+-Changes to DT (Greatly improved)\
+-Prediction system overhaul\
+-Aimbot changes\
+-Zeusbot changes\
+-Small other tweaks
 
 Update V1.2 (27/06/2021)\
 -Implemented Steam API\
