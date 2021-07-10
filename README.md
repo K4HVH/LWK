@@ -4,10 +4,17 @@
 
 Discord: https://discord.gg/uAsanYpP9G
 
-DLL: https://anonfiles.com/f4sau857u1/LWK_dll \
+DLL: https://anonfiles.com/t5L21551u8/LWK_dll \
 CFG: https://anonfiles.com/hfseua53ue/hvh_ob
 
 ![alt text](https://i.imgur.com/JK0lL5R.gif)
+
+Update V1.3.1 (10/07/2021)\
+-Actually committed V1.3 to main (Sorry, github brokey)\
+-Updated Runcommand hook\
+-Updated WriteUserCmd Hook\
+-Added CLMove Hook\
+-Improved DT
 
 Update V1.3 (09/07/2021)\
 -Slight changes to menu\
